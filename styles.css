@@ -8,5 +8,56 @@
 }
 
 .addTeilnehmerButton {
+  float: right;
   margin: 5px;
+}
+
+.addTeilnehmerButton:hover {
+  background-color: #8A5CF5;
+}
+
+.addTeilnehmerModalSaveButton {
+  float: right;
+  margin: 5px;
+}
+
+.addTeilnehmerModalSaveButton:hover {
+  background-color: #8A5CF5;
+}
+
+.addTeilnehmerModalInput {
+  margin: 5px;
+}
+
+.addTeilnehmerModalInput:hover {
+  background-color: #8A5CF5;
+}
+
+.combatViewUeberschriftenLayout {
+  display: grid;
+  grid-template-columns: 1fr 3fr 1fr;
+}
+
+.combatViewUeberschriftenAttribute {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.teilnehmerViewLayoutCollectionDiv {
+  border: 3px solid var(--background-modifier-border);
+  padding: 3px;
+}
+
+.teilnehmerViewLayoutSingleRow {
+  display: grid;
+  grid-template-columns: 1fr 3fr 1fr;
+}
+
+.teilnehmerViewAttributes {
+  border: 1px solid var(--background-modifier-border);
+  margin: 2px;
+  margin-top: 3px;
+  margin-bottom: 3px;
+  text-align: center;
 }
