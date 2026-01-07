@@ -1,8 +1,12 @@
-/*
+.teilnehmerDiv {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  border: 1px solid var(--background-modifier-border);
+  padding: 2px;
+  margin-bottom: 5px;
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-If your plugin does not need CSS, delete this file.
-
-*/
+.addTeilnehmerButton {
+  margin: 5px;
+}

@@ -1,18 +1,34 @@
 import {App, Editor, MarkdownView, Modal, Notice, Plugin} from 'obsidian';
 import {DEFAULT_SETTINGS, MyPluginSettings, SampleSettingTab} from "./settings";
+import { CombatView, VIEW_TYPE_EXAMPLE } from './combat-view';
+// import DSACombatTracker from './main';
 
 // Remember to rename these classes and interfaces!
 
-export default class MyPlugin extends Plugin {
+export default class DSACombatTracker extends Plugin {
 	settings: MyPluginSettings;
 
 	async onload() {
 		await this.loadSettings();
 
+		this.registerView(
+		VIEW_TYPE_EXAMPLE,
+		(leaf) => new CombatView(leaf));
+
 		// This creates an icon in the left ribbon.
-		this.addRibbonIcon('dice', 'Sample', (evt: MouseEvent) => {
+
+		this.addRibbonIcon('dice', 'Open combat view', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
+			// new Notice('This is a notice!');
+			// Öffnet neues Fenster des Plugins? -valle
+			this.activateView();
+		});
+
+		// Zeigt alle Leaves im workspace an
+		this.addRibbonIcon('dice', 'Print leaf types', () => {
+			this.app.workspace.iterateAllLeaves((leaf) => {
+				console.log(leaf.getViewState().type);
+			});
 		});
 
 		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
@@ -61,16 +77,39 @@ export default class MyPlugin extends Plugin {
 
 		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
 		// Using this function will automatically remove the event listener when this plugin is disabled.
+		/*
 		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
 			new Notice("Click");
 		});
+		*/
 
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+		//this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 
+		console.log("DSA Combat Tracker geladen");
 	}
 
 	onunload() {
+	}
+
+	async activateView() {
+		const { workspace } = this.app;
+
+		let leaf: WorkspaceLeaf | null = null;
+		const leaves = workspace.getLeavesOfType(VIEW_TYPE_EXAMPLE);
+
+		if (leaves.length > 0) {
+			// A leaf already exists, use that
+			leaf = leaves[0];
+		} else {
+			// View doesn't exist yet, create new leaf
+			// in the right sidebar
+			leaf = workspace.getRightLeaf(false);
+			await leaf.setViewState({ type: VIEW_TYPE_EXAMPLE, active: true});
+		}
+
+		// Reveal leaf in sidebar in case it's collapsed
+		workspace.revealLeaf(leaf);
 	}
 
 	async loadSettings() {
@@ -80,6 +119,9 @@ export default class MyPlugin extends Plugin {
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}
+
+	// implementierung der öffnung der View
+
 }
 
 class SampleModal extends Modal {
