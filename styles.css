@@ -61,3 +61,8 @@
   margin-bottom: 3px;
   text-align: center;
 }
+
+.teilnehmerViewAttributeInput {
+  width: 80%;
+  box-sizing: border-box;
+}
