@@ -35,9 +35,20 @@ export class CombatView extends ItemView {
 
     // Einen div erstellen, in dem alle Attribute angezeigt werden
     const teilnehmerCollectionDiv = container.createEl('div', {cls: "teilnehmerViewLayoutCollectionDiv"});
+    
+    // Event, durch das die Daten (Doppelklick) geändert werden können
     teilnehmerCollectionDiv.ondblclick = (evt: MouseEvent) => {
-         this.state.updateInputInView(evt);
-        };
+      // Merken der initialen Eingabe zur Übergabe an Combat-State
+      const currentElement = evt.target as HTMLElement;
+      const cell = currentElement.closest(".editable"); // div, der bearbeitet werden soll
+      let currentText = cell?.textContent;
+      // Umwandlung des geklickten div in input-Feld
+      if (cell == null) {
+        return;
+      } else {
+        this.makeEditable(cell, currentText);
+      }
+    };
     // Neuer Div für Button erstellt, damit beim neu Rendern des Arrays der Button unangetastet bleibt. 
     const saveTeilnehmerButton = container.createEl('div');
     // Legt ein vorgefertigtes Array an -> für Dev purposes
@@ -54,28 +65,49 @@ export class CombatView extends ItemView {
         // Alle Reihen aus der combatTeilnehmerliste werden in divs unterteilt
       for (let teilnehmer of this.state.getTeilnehmer()) {
         let singleTeilnehmerRow = teilnehmerCollectionDiv.createEl('div', {cls: "teilnehmerViewLayoutSingleRow"});
-        singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.ini), cls: "teilnehmerViewAttributes"});
-        singleTeilnehmerRow.createEl('div', {text: teilnehmer.name, cls: "teilnehmerViewAttributes"});
-        singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.leben), cls: "teilnehmerViewAttributes"});
+        singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.ini), cls: "teilnehmerViewAttribute editable"});
+        singleTeilnehmerRow.createEl('div', {text: teilnehmer.name, cls: "teilnehmerViewAttribute editable"});
+        singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.leben), cls: "teilnehmerViewAttribute editable"});
       }
       }).open();
     };
 
-    // EventListener, der darauf lauscht, ob ein div eines combatTeilnehmers verändert werden soll (per doppelklick)
-
-
-
     // Alle Namen aus der Liste werden zu Anfang angezeigt
     for (let teilnehmer of this.state.getTeilnehmer()) {
         let singleTeilnehmerRow = teilnehmerCollectionDiv.createEl('div', {cls: "teilnehmerViewLayoutSingleRow"});
-        singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.ini), cls: "teilnehmerViewAttributes"});
-        singleTeilnehmerRow.createEl('div', {text: teilnehmer.name, cls: "teilnehmerViewAttributes"});
-        singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.leben), cls: "teilnehmerViewAttributes"});
+        singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.ini), cls: "teilnehmerViewAttribute editable"});
+        singleTeilnehmerRow.createEl('div', {text: teilnehmer.name, cls: "teilnehmerViewAttribute editable"});
+        singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.leben), cls: "teilnehmerViewAttribute editable"});
       }
 
   }
 
   async onClose() {
     // Nothing to clean up.
+  }
+
+  // Methode, die ein div in ein input-Felt verwandelt.
+  makeEditable(cell: Element, currentText: string | undefined): void {
+    cell.empty(); // Feld leeren
+    
+    const input = cell.createEl('input', {
+      placeholder: cell.textContent,
+      cls: "teilnehmerViewAttribute"
+    });
+
+    input.focus(); // Wählt das Feld direkt zum Schreiben an
+
+    let commited = false;
+
+    // EventListener zur Entscheidung, ob Eingabe gespeichert oder verworfen werden soll
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") new Notice("Save");
+      if (e.key === "Escape") cancel();
+    });
+
+    const cancel = () => {
+      cell.textContent = currentText;
+    }
+
   }
 }

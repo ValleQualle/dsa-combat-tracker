@@ -23,7 +23,8 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
         return this.combatTeilnehmer.sort((a, b) => b.ini - a.ini); // Absteigende Sortierung
     }
 
-    updateInputInView(event: MouseEvent): void {
-        console.log("Nach Render, State:", event.target);
+    updateEditedField(oldValue: string, newValue: string): void {
+        // sucht den alten Wert aus dem Array und erstzt ihn durch den neuen Wert
+        // noch unsicher, wie ich die Daten raussuche.. am besten Index für ELement angeben. Aber wie? 
     }
 }
