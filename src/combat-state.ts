@@ -27,12 +27,29 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
         return this.combatTeilnehmer.sort((a, b) => b.ini - a.ini); // Absteigende Sortierung
     }
 
-    updateEditedField(currentElement: HTMLElement, Teilnehmer: HTMLElement): void {
+    updateEditedField(currentDiv: HTMLElement, newInputValue: string, Teilnehmer: HTMLElement): void {
         // sucht den alten Wert aus dem Array und erstzt ihn durch den neuen Wert
         // noch unsicher, wie ich die Daten raussuche.. am besten Index für ELement angeben. Aber wie? 
         const id = Teilnehmer.dataset.teilnehmerId;
-        console.log(currentElement.dataset);
+        console.log(Teilnehmer.dataset);
         const foundTeilnehmer = this.combatTeilnehmer.find(Teilnehmer => Teilnehmer.teilnehmnerId === Number(id));
 
+        if (!foundTeilnehmer) {
+            console.error("Teilnehmer nicht gefunden! (combat-state / updateEditedField())");
+            return;
+        }
+
+        if (currentDiv.dataset.divType === "leben") {
+            foundTeilnehmer.leben = Number(newInputValue);
+            return;
+        } else if (currentDiv.dataset.divType === "ini") {
+            foundTeilnehmer.ini = Number(newInputValue);
+            return;
+        } else if (currentDiv.dataset.divType === "name") {
+            foundTeilnehmer.name = String(newInputValue);
+            return;
+        } else {
+            console.error("divType nicht in Teilnehmer vorhanden! (combat-state / updateEditableField())");
+        }
     }
 }

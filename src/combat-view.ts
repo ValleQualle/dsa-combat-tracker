@@ -113,7 +113,6 @@ export class CombatView extends ItemView {
     // Der Fokus auf das angewählte Element geht verloren und die alten Daten und das div 
     // wird wieder angezeigt
     input.addEventListener("blur", () => {
-      new Notice(String(teilnehmerElementId));
       // Wenn nichts im input steht => Wiederherstellung der letzten Eingabe
       if (input.value.trim() === "") {
         cancel();
@@ -130,7 +129,7 @@ export class CombatView extends ItemView {
       cell.textContent = input.value;
 
       // Der neue Wert soll mit in die Teilnehmer Datenstruktur gespeichert werden
-      this.state.updateEditedField(currentElement, teilnehmerElement);
+      this.state.updateEditedField(currentElement, input.value, teilnehmerElement);
 
       // Da ini geändert werden kann, muss auch geschaut werden, ob neu sortiert werden muss
       this.state.sortTeilnehmer();
