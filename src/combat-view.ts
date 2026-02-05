@@ -48,7 +48,7 @@ export class CombatView extends ItemView {
       if (cell == null) {
         return;
       } else {
-        this.makeEditable(cell, currentText);
+        this.makeEditable(currentElement, cell, currentText);
       }
     };
     // Neuer Div für Button erstellt, damit beim neu Rendern des Arrays der Button unangetastet bleibt. 
@@ -67,9 +67,9 @@ export class CombatView extends ItemView {
         // Alle Reihen aus der combatTeilnehmerliste werden in divs unterteilt
       for (let teilnehmer of this.state.getTeilnehmer()) {
         let singleTeilnehmerRow = teilnehmerCollectionDiv.createEl('div', {cls: "teilnehmerViewLayoutSingleRow", attr: {"data-teilnehmer-id": teilnehmer.teilnehmnerId}});
-        singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.ini), cls: "teilnehmerViewAttribute editable"});
-        singleTeilnehmerRow.createEl('div', {text: teilnehmer.name, cls: "teilnehmerViewAttribute editable"});
-        singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.leben), cls: "teilnehmerViewAttribute editable"});
+        singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.ini), cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "ini"}});
+        singleTeilnehmerRow.createEl('div', {text: teilnehmer.name, cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "name"}});
+        singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.leben), cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "leben"}});
       }
       }).open();
     };
@@ -77,9 +77,9 @@ export class CombatView extends ItemView {
     // Alle Namen aus der Liste werden zu Anfang angezeigt
     for (let teilnehmer of this.state.getTeilnehmer()) {
         let singleTeilnehmerRow = teilnehmerCollectionDiv.createEl('div', {cls: "teilnehmerViewLayoutSingleRow", attr: {"data-teilnehmer-id": teilnehmer.teilnehmnerId}});
-        singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.ini), cls: "teilnehmerViewAttribute editable"});
-        singleTeilnehmerRow.createEl('div', {text: teilnehmer.name, cls: "teilnehmerViewAttribute editable"});
-        singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.leben), cls: "teilnehmerViewAttribute editable"});
+        singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.ini), cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "ini"}});
+        singleTeilnehmerRow.createEl('div', {text: teilnehmer.name, cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "name"}});
+        singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.leben), cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "leben"}});
       }
 
   }
@@ -89,11 +89,11 @@ export class CombatView extends ItemView {
   }
 
   // Methode, die ein div in ein input-Felt verwandelt.
-  makeEditable(cell: Element, currentText: string | null): void {
+  makeEditable(currentElement: HTMLElement, cell: Element, currentText: string | null): void {
     cell.empty(); // Feld leeren
     
     const teilnehmerElement = cell.closest(".teilnehmerViewLayoutSingleRow") as HTMLElement;
-    const teilnehmerElementId = teilnehmerElement.dataset
+    const teilnehmerElementId = teilnehmerElement.dataset;
 
     const input = cell.createEl("input", {
       value: cell.textContent,
@@ -130,7 +130,7 @@ export class CombatView extends ItemView {
       cell.textContent = input.value;
 
       // Der neue Wert soll mit in die Teilnehmer Datenstruktur gespeichert werden
-      //this.state.updateEditedField(teilnehmerElement: HTMLElement);
+      this.state.updateEditedField(currentElement, teilnehmerElement);
 
       // Da ini geändert werden kann, muss auch geschaut werden, ob neu sortiert werden muss
       this.state.sortTeilnehmer();
