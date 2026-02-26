@@ -1,10 +1,8 @@
 import type { Teilnehmer } from './types';
-import { Teilnehmer } from './types';
 
 export class CombatState { // Erbt von nichts, da kein View oder Plugin
     private combatTeilnehmer: Teilnehmer[] = [];
-    private globalTeilnehmerCount: number;
-
+    private globalTeilnehmerCount: number = 0;
     defaultTeilnehmerArray(): void {
         this.combatTeilnehmer.push({teilnehmnerId: 1, ini: 15, name: "Alice", leben: 10});
         this.combatTeilnehmer.push({teilnehmnerId: 2, ini: 12, name: "Bob", leben: 25});
@@ -42,8 +40,9 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
         if (currentDiv.dataset.divType === "leben") {
             foundTeilnehmer.leben = Number(newInputValue);
             return;
-        } else if (currentDiv.dataset.divType === "ini") {
+        } else if (currentDiv.dataset.divType === "ini") { 
             foundTeilnehmer.ini = Number(newInputValue);
+            this.sortTeilnehmer();
             return;
         } else if (currentDiv.dataset.divType === "name") {
             foundTeilnehmer.name = String(newInputValue);
