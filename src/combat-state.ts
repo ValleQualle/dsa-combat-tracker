@@ -1,8 +1,11 @@
 import type { Teilnehmer } from './types';
+import { Teilnehmer } from './types';
+import { Notice, Editor } from 'obsidian';
 
 export class CombatState { // Erbt von nichts, da kein View oder Plugin
     private combatTeilnehmer: Teilnehmer[] = [];
     private globalTeilnehmerCount: number = 0;
+    private activeTeilnehmer: number = -1; // Der Index des Teilnehmers, der gerade gehighlightet ist
     defaultTeilnehmerArray(): void {
         this.combatTeilnehmer.push({teilnehmnerId: 1, ini: 15, name: "Alice", leben: 10});
         this.combatTeilnehmer.push({teilnehmnerId: 2, ini: 12, name: "Bob", leben: 25});
@@ -29,7 +32,6 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
         // sucht den alten Wert aus dem Array und erstzt ihn durch den neuen Wert
         // noch unsicher, wie ich die Daten raussuche.. am besten Index für ELement angeben. Aber wie? 
         const id = Teilnehmer.dataset.teilnehmerId;
-        console.log(Teilnehmer.dataset);
         const foundTeilnehmer = this.combatTeilnehmer.find(Teilnehmer => Teilnehmer.teilnehmnerId === Number(id));
 
         if (!foundTeilnehmer) {
@@ -50,5 +52,25 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
         } else {
             console.error("divType nicht in Teilnehmer vorhanden! (combat-state / updateEditableField())");
         }
+    }
+
+    nextCombatTeilnehmer(): void {
+        if (this.combatTeilnehmer == null) { // Null-check, fall kein Teilnehmer in der Liste
+            new Notice("Keinen Teilnehmer gefunden. (combat-state / nextCombatTeilnehmer");
+            return;
+        }
+         // Kein aktiver Teilnehmer, also Anfang der Liste beginnen activeTeilnehmer = 0
+         // Hier kann als Erweiterung später noch geschaut werden, ob leben > 0 ist, sonst
+         // kann der Entrag übersprungen werden
+        new Notice("Combat-Teilnehmer gefunden");
+        this.activeTeilnehmer = (this.activeTeilnehmer + 1) % this.globalTeilnehmerCount;
+    }
+
+    isCombatTeilnehmerEmpty(): boolean {
+        return this.combatTeilnehmer.length <= 0 ? true : false;
+    } 
+
+    getActiveTeilnehmer(): number {
+        return this.activeTeilnehmer;
     }
 }

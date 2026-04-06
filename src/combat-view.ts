@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf, Notice } from 'obsidian';
+import { ItemView, WorkspaceLeaf, Notice, setIcon } from 'obsidian';
 import { AddPlayerModal  } from 'add-modal';
 import DSACombatTracker from './main';
 import { Teilnehmer } from './types';
@@ -11,6 +11,8 @@ export class CombatView extends ItemView {
   private container = this.contentEl;
   // Einen div erstellen, in dem alle Attribute angezeigt werden
   private teilnehmerCollectionDiv!: HTMLElement;
+  // Liste aller angezeigten HTMLElemente der Combat-Teilnehmer Liste
+  private htmlElementeTeilnehmerListe: HTMLElement[] = [];
 
   constructor(leaf: WorkspaceLeaf) {
     super(leaf);
@@ -61,12 +63,25 @@ export class CombatView extends ItemView {
     addTeilnehmerButton.onclick = (evt: MouseEvent) => {
       new AddPlayerModal(this.app, (neuerTeilnehmer: Teilnehmer) => {
         this.state.addTeilnehmer(neuerTeilnehmer);
-        // Das Array wird nach ini-Wert sortiert
-        //sortArrayIniValue(combatTeilnehmer);
         this.teilnehmerCollectionDiv.empty();
       
         this.renderCombatList();
       }).open();
+    };
+    // Der Play-Button, der den Verlauf des Combats um einen Mitspieler weiter verschiebt.
+    let playTeilnehmerButton = saveTeilnehmerButton.createEl('button', {cls: 'addTeilnehmerButton'});
+    setIcon(playTeilnehmerButton, 'arrow-big-right-dash');
+    playTeilnehmerButton.onclick = (evt: MouseEvent) => {
+      // Die background-color des nächsten Eintrages wird auf die highlight-color gesetzt
+      // Die background-color des vorherigen Eintrages wird auf none gesetzt
+      if (this.state.isCombatTeilnehmerEmpty()) { // Die Liste ist leer
+        new Notice("Keine Combat-Teilnehmer");
+        return;
+      } else {
+        new Notice("Combat-Teilnehmer");
+        this.state.nextCombatTeilnehmer();
+        this.updateHighlight(this.state.getActiveTeilnehmer());
+      }
     };
   }
 
@@ -132,12 +147,35 @@ export class CombatView extends ItemView {
 
   renderCombatList(): void {
     this.teilnehmerCollectionDiv.empty();
+    this.htmlElementeTeilnehmerListe = []; // Leert Array zur neuen Befüllung
     // Alle Namen aus der Liste werden zu Anfang angezeigt
     for (let teilnehmer of this.state.getTeilnehmer()) {
         let singleTeilnehmerRow = this.teilnehmerCollectionDiv.createEl('div', {cls: "teilnehmerViewLayoutSingleRow", attr: {"data-teilnehmer-id": teilnehmer.teilnehmnerId}});
         singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.ini), cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "ini"}});
         singleTeilnehmerRow.createEl('div', {text: teilnehmer.name, cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "name"}});
         singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.leben), cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "leben"}});
+        // Neuer Teilnehmer wird in die HTMLElements Liste aufgenommen
+        this.htmlElementeTeilnehmerListe.push(singleTeilnehmerRow);
       }
+  }
+
+  updateHighlight(nextID: number): void {
+    this.htmlElementeTeilnehmerListe.forEach((el, i) => {
+      if (nextID === i) {
+        const allChildren = el.children; 
+        
+        for (let j = 0; j < allChildren.length; j++) {
+          const child = allChildren[j] as HTMLElement;
+          child.classList.add("highlight");
+        }
+      } else {
+        const allChildren = el.children; 
+        
+        for (let j = 0; j < allChildren.length; j++) {
+          const child = allChildren[j] as HTMLElement;
+          child.classList.remove("highlight");
+        }
+      }
+    });
   }
 }

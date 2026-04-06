@@ -13,7 +13,7 @@
 }
 
 .addTeilnehmerButton:hover {
-  background-color: #8A5CF5;
+  background-color: #6437cc;
 }
 
 .addTeilnehmerModalSaveButton {
@@ -22,7 +22,7 @@
 }
 
 .addTeilnehmerModalSaveButton:hover {
-  background-color: #8A5CF5;
+  background-color: #6437cc;
 }
 
 .addTeilnehmerModalInput {
@@ -30,7 +30,7 @@
 }
 
 .addTeilnehmerModalInput:hover {
-  background-color: #8A5CF5;
+  background-color: #6437cc;
 }
 
 .combatViewUeberschriftenLayout {
@@ -60,6 +60,10 @@
   margin-top: 3px;
   margin-bottom: 3px;
   text-align: center;
+}
+
+.highlight {
+  background-color: #6437cc;
 }
 
 .teilnehmerViewAttributeInput {
