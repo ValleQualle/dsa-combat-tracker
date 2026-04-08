@@ -1,11 +1,11 @@
-import type { Teilnehmer } from './types';
 import { Teilnehmer } from './types';
-import { Notice, Editor } from 'obsidian';
+import { Notice } from 'obsidian';
 
 export class CombatState { // Erbt von nichts, da kein View oder Plugin
     private combatTeilnehmer: Teilnehmer[] = [];
     private globalTeilnehmerCount: number = 0;
     private activeTeilnehmer: number = -1; // Der Index des Teilnehmers, der gerade gehighlightet ist
+    
     defaultTeilnehmerArray(): void {
         this.combatTeilnehmer.push({teilnehmnerId: 1, ini: 15, name: "Alice", leben: 10});
         this.combatTeilnehmer.push({teilnehmnerId: 2, ini: 12, name: "Bob", leben: 25});
@@ -18,6 +18,7 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
         this.globalTeilnehmerCount = this.globalTeilnehmerCount + 1;
         this.combatTeilnehmer.push(newTeilnehmer);
         this.sortTeilnehmer(); 
+        this.updateHighlightWhenPlayerAdded(newTeilnehmer.ini);
     }
 
     getTeilnehmer(): Teilnehmer[] {
@@ -45,6 +46,7 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
         } else if (currentDiv.dataset.divType === "ini") { 
             foundTeilnehmer.ini = Number(newInputValue);
             this.sortTeilnehmer();
+            this.updateHighlightWhenPlayerAdded(foundTeilnehmer.ini);
             return;
         } else if (currentDiv.dataset.divType === "name") {
             foundTeilnehmer.name = String(newInputValue);
@@ -62,14 +64,25 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
          // Kein aktiver Teilnehmer, also Anfang der Liste beginnen activeTeilnehmer = 0
          // Hier kann als Erweiterung später noch geschaut werden, ob leben > 0 ist, sonst
          // kann der Entrag übersprungen werden
-        new Notice("Combat-Teilnehmer gefunden");
         this.activeTeilnehmer = (this.activeTeilnehmer + 1) % this.globalTeilnehmerCount;
+    }
+
+    // Wenn ein Teilnehmer mehr oder gleich viel ini hat wie der aktuelle gehighlightete
+    // Teilnehmer, wird der Highlight counter verschoben, um das Highlight auf dem  
+    // aktuellen Teilnehmer zu behalten.
+    // Kann erweitert werden, wenn > 1 Teilnehmer auf einmal zur Liste hinzugefügt werden
+    // kann. 
+    updateHighlightWhenPlayerAdded(iniTeilnehmer: number): void {
+        if (this.activeTeilnehmer > 0 && this.combatTeilnehmer[this.activeTeilnehmer]!.ini <= iniTeilnehmer) {
+            this.activeTeilnehmer++;
+        }
     }
 
     isCombatTeilnehmerEmpty(): boolean {
         return this.combatTeilnehmer.length <= 0 ? true : false;
     } 
 
+    // Gibt den Index des aktuell gehighlighteten Teilnehmers im Array zurück
     getActiveTeilnehmer(): number {
         return this.activeTeilnehmer;
     }

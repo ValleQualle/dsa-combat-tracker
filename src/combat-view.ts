@@ -78,7 +78,6 @@ export class CombatView extends ItemView {
         new Notice("Keine Combat-Teilnehmer");
         return;
       } else {
-        new Notice("Combat-Teilnehmer");
         this.state.nextCombatTeilnehmer();
         this.updateHighlight(this.state.getActiveTeilnehmer());
       }
@@ -131,11 +130,8 @@ export class CombatView extends ItemView {
 
       // Der neue Wert soll mit in die Teilnehmer Datenstruktur gespeichert werden
       this.state.updateEditedField(currentElement, input.value, teilnehmerElement);
+      new Notice("Ini ändern");
       this.renderCombatList();
-
-      // Hinterfrage, ob ich nicht lieber in state sortieren sollte. Dort direkt an der Quelle
-      // Da ini geändert werden kann, muss auch geschaut werden, ob neu sortiert werden muss
-      //this.state.sortTeilnehmer();
     }
 
     // Der Text im div wird wieder auf den vorherigen Wert gesetzt
@@ -156,26 +152,31 @@ export class CombatView extends ItemView {
         singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.leben), cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "leben"}});
         // Neuer Teilnehmer wird in die HTMLElements Liste aufgenommen
         this.htmlElementeTeilnehmerListe.push(singleTeilnehmerRow);
-      }
+    } 
+    this.updateHighlight(this.state.getActiveTeilnehmer());
   }
 
+  // Bekommt den nächsten Teilnehmer aus der Liste und Highlightet diesen
+  // alle anderen Einträgen wird das Highlight entzogen
   updateHighlight(nextID: number): void {
-    this.htmlElementeTeilnehmerListe.forEach((el, i) => {
-      if (nextID === i) {
-        const allChildren = el.children; 
-        
-        for (let j = 0; j < allChildren.length; j++) {
-          const child = allChildren[j] as HTMLElement;
-          child.classList.add("highlight");
+    if (this.state.getActiveTeilnehmer() >= 0) {
+      this.htmlElementeTeilnehmerListe.forEach((el, i) => {
+        if (nextID === i) {
+          const allChildren = el.children; 
+          
+          for (let j = 0; j < allChildren.length; j++) {
+            const child = allChildren[j] as HTMLElement;
+            child.classList.add("highlight");
+          }
+        } else {
+          const allChildren = el.children; 
+          
+          for (let j = 0; j < allChildren.length; j++) {
+            const child = allChildren[j] as HTMLElement;
+            child.classList.remove("highlight");
+          }
         }
-      } else {
-        const allChildren = el.children; 
-        
-        for (let j = 0; j < allChildren.length; j++) {
-          const child = allChildren[j] as HTMLElement;
-          child.classList.remove("highlight");
-        }
-      }
-    });
+      });
+    }
   }
 }
