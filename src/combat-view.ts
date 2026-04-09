@@ -114,11 +114,7 @@ export class CombatView extends ItemView {
     // wird wieder angezeigt
     input.addEventListener("blur", () => {
       // Wenn nichts im input steht => Wiederherstellung der letzten Eingabe
-      if (input.value.trim() === "") {
         cancel();
-      } else { // Wenn ich etwas in input geschrieben habe und blur triggert => save der Eingabe
-        save();
-      }
     });
 
     // Die eingegebenen Daten sollen übernommen werden.
@@ -130,7 +126,6 @@ export class CombatView extends ItemView {
 
       // Der neue Wert soll mit in die Teilnehmer Datenstruktur gespeichert werden
       this.state.updateEditedField(currentElement, input.value, teilnehmerElement);
-      new Notice("Ini ändern");
       this.renderCombatList();
     }
 
@@ -146,7 +141,7 @@ export class CombatView extends ItemView {
     this.htmlElementeTeilnehmerListe = []; // Leert Array zur neuen Befüllung
     // Alle Namen aus der Liste werden zu Anfang angezeigt
     for (let teilnehmer of this.state.getTeilnehmer()) {
-        let singleTeilnehmerRow = this.teilnehmerCollectionDiv.createEl('div', {cls: "teilnehmerViewLayoutSingleRow", attr: {"data-teilnehmer-id": teilnehmer.teilnehmnerId}});
+        let singleTeilnehmerRow = this.teilnehmerCollectionDiv.createEl('div', {cls: "teilnehmerViewLayoutSingleRow", attr: {"data-teilnehmer-id": teilnehmer.teilnehmerId}});
         singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.ini), cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "ini"}});
         singleTeilnehmerRow.createEl('div', {text: teilnehmer.name, cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "name"}});
         singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.leben), cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "leben"}});
