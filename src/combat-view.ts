@@ -53,6 +53,8 @@ export class CombatView extends ItemView {
         this.makeEditable(currentElement, cell, currentText);
       }
     };
+
+    
     // Neuer Div für Button erstellt, damit beim neu Rendern des Arrays der Button unangetastet bleibt. 
     const saveTeilnehmerButton = this.container.createEl('div');
     // Legt ein vorgefertigtes Array an -> für Dev purposes
@@ -68,6 +70,8 @@ export class CombatView extends ItemView {
         this.renderCombatList();
       }).open();
     };
+
+
     // Der Play-Button, der den Verlauf des Combats um einen Mitspieler weiter verschiebt.
     let playTeilnehmerButton = saveTeilnehmerButton.createEl('button', {cls: 'addTeilnehmerButton'});
     setIcon(playTeilnehmerButton, 'arrow-big-right-dash');
@@ -92,8 +96,9 @@ export class CombatView extends ItemView {
   makeEditable(currentElement: HTMLElement, cell: Element, currentText: string | null): void {
     cell.empty(); // Feld leeren
     
-    const teilnehmerElement = cell.closest(".teilnehmerViewLayoutSingleRow") as HTMLElement;
-    const teilnehmerElementId = teilnehmerElement.dataset;
+    let id = Number(currentElement.parentElement?.getAttribute('data-teilnehmer-id')); // Die TeilnehmerId zum geklickten Feld
+    console.info(id);
+    let field = currentElement.getAttribute('data-div-type'); // Das Feld, was angeklickt wurde
 
     const input = cell.createEl("input", {
       value: cell.textContent,
@@ -101,8 +106,6 @@ export class CombatView extends ItemView {
     });
 
     input.focus(); // Wählt das Feld direkt zum Schreiben an
-
-    let commited = false;
 
     // EventListener zur Entscheidung, ob Eingabe gespeichert oder verworfen werden soll
     input.addEventListener("keydown", (e) => {
@@ -125,7 +128,7 @@ export class CombatView extends ItemView {
       cell.textContent = input.value;
 
       // Der neue Wert soll mit in die Teilnehmer Datenstruktur gespeichert werden
-      this.state.updateEditedField(currentElement, input.value, teilnehmerElement);
+      this.state.updateEditedField(field, input.value, id);
       this.renderCombatList();
     }
 

@@ -124,5 +124,5 @@ test('Verschobener TN Highlight-Verhalten (<)', () => {
   state.nextCombatTeilnehmer(); // activeTN == 0
   state.nextCombatTeilnehmer(); // activeTN == 1
 
-  state.
+  
 })
