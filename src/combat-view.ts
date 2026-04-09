@@ -97,7 +97,6 @@ export class CombatView extends ItemView {
     cell.empty(); // Feld leeren
     
     let id = Number(currentElement.parentElement?.getAttribute('data-teilnehmer-id')); // Die TeilnehmerId zum geklickten Feld
-    console.info(id);
     let field = currentElement.getAttribute('data-div-type'); // Das Feld, was angeklickt wurde
 
     const input = cell.createEl("input", {

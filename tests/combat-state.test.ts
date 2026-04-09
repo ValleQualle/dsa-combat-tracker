@@ -114,15 +114,19 @@ test('Neuer TN Highlight-Verhalten 3 (<)', () => {
 
 // Nicht leere Liste, activeTN == len, 
 // bestehender TN wird vor activeTN verschoben (ini < activeTN.ini)
-test('Verschobener TN Highlight-Verhalten (<)', () => {
+test('Verschobener TN Highlight-Verhalten 4 (<)', () => {
   const state = new CS.CombatState();
   // 3 Teilnehmer in die Liste laden 
   state.addTeilnehmer(alleTeilnehmer[0]!); // 20
   state.addTeilnehmer(alleTeilnehmer[1]!); // 15
   state.addTeilnehmer(alleTeilnehmer[2]!); // 10
+  state.addTeilnehmer(alleTeilnehmer[3]!); // 5
 
   state.nextCombatTeilnehmer(); // activeTN == 0
   state.nextCombatTeilnehmer(); // activeTN == 1
+  state.nextCombatTeilnehmer(); // activeTN == 2
 
-  
+  state.updateEditedField('ini', '3', 1);
+
+  expect(state.getActiveTeilnehmer()).toBe(1);
 })

@@ -15,6 +15,7 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
 
     addTeilnehmer(newTeilnehmer: Teilnehmer): void {
         newTeilnehmer.teilnehmerId = this.globalTeilnehmerCount + 1;
+        console.info("TeilnehmerId: ", newTeilnehmer.teilnehmerId);
         this.globalTeilnehmerCount = this.globalTeilnehmerCount + 1;
         this.combatTeilnehmer.push(newTeilnehmer);
         this.sortTeilnehmer(); 
@@ -32,10 +33,7 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
     updateEditedField(field: string, newInputValue: string, id: number): void {
         // sucht den alten Wert aus dem Array und erstzt ihn durch den neuen Wert
         // noch unsicher, wie ich die Daten raussuche.. am besten Index für ELement angeben. Aber wie? 
-        const foundTeilnehmer = this.combatTeilnehmer.find(Teilnehmer => Teilnehmer.teilnehmerId == Number(id));
-        // console.info("TeilnehmerID: ", id)
-        console.debug(foundTeilnehmer);
-
+        let foundTeilnehmer = this.combatTeilnehmer.find(Teilnehmer => Teilnehmer.teilnehmerId == Number(id));
 
         if (!foundTeilnehmer) {
             throw new Error('Teilnehmer nicht gefunden! (combat-state / updateEditedField())')
@@ -47,6 +45,7 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
         } else if (field === "ini") { 
             foundTeilnehmer.ini = Number(newInputValue);
             this.sortTeilnehmer();
+            console.info("Vorher fT: ", foundTeilnehmer.ini);
             this.updateHighlightWhenPlayerAdded(foundTeilnehmer.ini);
             return;
         } else if (field === "name") {
@@ -69,13 +68,13 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
         this.activeTeilnehmer = (this.activeTeilnehmer + 1) % this.globalTeilnehmerCount;
     }
 
-    // Wenn ein Teilnehmer mehr oder gleich viel ini hat wie der aktuelle gehighlightete
-    // Teilnehmer, wird der Highlight counter verschoben, um das Highlight auf dem  
+    // Wenn das Verschobene Element am aktuellen Element vorbeizieht,
+    // wird der Highlight counter verschoben, um das Highlight auf dem  
     // aktuellen Teilnehmer zu behalten.
     // Kann erweitert werden, wenn > 1 Teilnehmer auf einmal zur Liste hinzugefügt werden
     // kann. 
     updateHighlightWhenPlayerAdded(iniTeilnehmer: number): void {
-        if (this.activeTeilnehmer >= 0 && this.combatTeilnehmer[this.activeTeilnehmer]!.ini <= iniTeilnehmer) {
+        if ((this.activeTeilnehmer >= 0) && (this.combatTeilnehmer[this.activeTeilnehmer]!.ini <= iniTeilnehmer)) {
             this.activeTeilnehmer++;
         }
     }
