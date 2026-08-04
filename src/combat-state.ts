@@ -4,7 +4,8 @@ import { Notice } from 'obsidian';
 export class CombatState { // Erbt von nichts, da kein View oder Plugin
     private combatTeilnehmer: Teilnehmer[] = [];
     private globalTeilnehmerCount: number = 0;
-    private activeTeilnehmer: number = -1; // Der Index des Teilnehmers, der gerade gehighlightet ist
+    // Hier muss die teilnehmerID genutzt werden. In der Liste suchen und dann Highlighten?
+    private activeTeilnehmerID: number = -1; // Der Index des Teilnehmers, der gerade gehighlightet ist
     
     defaultTeilnehmerArray(): void {
         this.combatTeilnehmer.push({teilnehmerId: 1, ini: 15, name: "Alice", leben: 10});
@@ -14,12 +15,13 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
     }
 
     addTeilnehmer(newTeilnehmer: Teilnehmer): void {
+        if (this.activeTeilnehmerID === -1) {
+            this.activeTeilnehmerID = newTeilnehmer.teilnehmerId;
+        }
         newTeilnehmer.teilnehmerId = this.globalTeilnehmerCount + 1;
-        console.info("TeilnehmerId: ", newTeilnehmer.teilnehmerId);
         this.globalTeilnehmerCount = this.globalTeilnehmerCount + 1;
         this.combatTeilnehmer.push(newTeilnehmer);
-        this.sortTeilnehmer(); 
-        this.updateHighlightWhenPlayerAdded(newTeilnehmer.ini);
+        this.sortTeilnehmer();
     }
 
     getTeilnehmer(): Teilnehmer[] {
@@ -45,8 +47,6 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
         } else if (field === "ini") { 
             foundTeilnehmer.ini = Number(newInputValue);
             this.sortTeilnehmer();
-            console.info("Vorher fT: ", foundTeilnehmer.ini);
-            this.updateHighlightWhenPlayerAdded(foundTeilnehmer.ini);
             return;
         } else if (field === "name") {
             foundTeilnehmer.name = String(newInputValue);
@@ -60,31 +60,37 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
         // Wenn die Liste der Teilnehmer nicht definiert oder definiert aber leer ist,
         // wirft der Versuch ein Highlight zu setzen einen Error
         if (this.combatTeilnehmer == null || this.isCombatTeilnehmerEmpty()) { // Null-check, fall kein Teilnehmer in der Liste
-            throw new Error('Keinen Teilnehmer gefunden. (combat-state / nextCombatTeilnehmer');
+            throw new Error('Keinen Teilnehmer gefunden. (combat-state / nextCombatTeilnehmer())');
         }
-         // Kein aktiver Teilnehmer, also Anfang der Liste beginnen activeTeilnehmer = 0
+         // Kein aktiver Teilnehmer, also Anfang der Liste beginnen activeTeilnehmerIndex = 0
          // Hier kann als Erweiterung später noch geschaut werden, ob leben > 0 ist, sonst
          // kann der Entrag übersprungen werden
-        this.activeTeilnehmer = (this.activeTeilnehmer + 1) % this.globalTeilnehmerCount;
-    }
-
-    // Wenn das Verschobene Element am aktuellen Element vorbeizieht,
-    // wird der Highlight counter verschoben, um das Highlight auf dem  
-    // aktuellen Teilnehmer zu behalten.
-    // Kann erweitert werden, wenn > 1 Teilnehmer auf einmal zur Liste hinzugefügt werden
-    // kann. 
-    updateHighlightWhenPlayerAdded(iniTeilnehmer: number): void {
-        if ((this.activeTeilnehmer >= 0) && (this.combatTeilnehmer[this.activeTeilnehmer]!.ini <= iniTeilnehmer)) {
-            this.activeTeilnehmer++;
+        if (this.activeTeilnehmerID === -1 && !this.isCombatTeilnehmerEmpty()) {
+            this.activeTeilnehmerID = this.combatTeilnehmer[0]!.teilnehmerId;
+        } else {
+            this.activeTeilnehmerID = this.combatTeilnehmer[(this.getActiveTeilnehmerIndex() + 1) % this.globalTeilnehmerCount]!.teilnehmerId;
         }
+        
     }
 
     isCombatTeilnehmerEmpty(): boolean {
         return this.combatTeilnehmer.length <= 0 ? true : false;
     } 
 
-    // Gibt den Index des aktuell gehighlighteten Teilnehmers im Array zurück
-    getActiveTeilnehmer(): number {
-        return this.activeTeilnehmer;
+    // Gibt den die teilnehmerID des aktuell gehighlighteten Teilnehmers im Array zurück
+    getActiveTeilnehmerID(): number {
+        return this.isCombatTeilnehmerEmpty() ? -1 : this.activeTeilnehmerID;
+    }
+
+    // Gibt den Index des aktiven Teilnehmers in dem Array zurück.
+    // Wenn kein Teilnehmer in der Liste ist, wird ein Error ausgegeben
+    getActiveTeilnehmerIndex(): number {
+        let index = 0;
+        for (index; index < this.combatTeilnehmer.length; index++) {
+            if (this.combatTeilnehmer[index]?.teilnehmerId === this.activeTeilnehmerID) {
+                return index;
+            }
+        }
+        return -1;
     }
 }
