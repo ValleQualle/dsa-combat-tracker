@@ -79,11 +79,11 @@ export class CombatView extends ItemView {
       // Die background-color des nächsten Eintrages wird auf die highlight-color gesetzt
       // Die background-color des vorherigen Eintrages wird auf none gesetzt
       if (this.state.isCombatTeilnehmerEmpty()) { // Die Liste ist leer
-        new Notice("Keine Combat-Teilnehmer");
+        new Notice("Noch Keine Combat-Teilnehmer");
         return;
       } else {
         this.state.nextCombatTeilnehmer();
-        this.updateHighlight(this.state.getActiveTeilnehmer());
+        this.updateHighlight(this.state.getActiveTeilnehmerIndex());
       }
     };
   }
@@ -150,13 +150,13 @@ export class CombatView extends ItemView {
         // Neuer Teilnehmer wird in die HTMLElements Liste aufgenommen
         this.htmlElementeTeilnehmerListe.push(singleTeilnehmerRow);
     } 
-    this.updateHighlight(this.state.getActiveTeilnehmer());
+    this.updateHighlight(this.state.getActiveTeilnehmerIndex());
   }
 
   // Bekommt den nächsten Teilnehmer aus der Liste und Highlightet diesen
   // alle anderen Einträgen wird das Highlight entzogen
   updateHighlight(nextID: number): void {
-    if (this.state.getActiveTeilnehmer() >= 0) {
+    if (this.state.getActiveTeilnehmerIndex() >= 0) {
       this.htmlElementeTeilnehmerListe.forEach((el, i) => {
         if (nextID === i) {
           const allChildren = el.children; 
