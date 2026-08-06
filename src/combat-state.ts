@@ -30,6 +30,22 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
         this.sortTeilnehmer();
     }
 
+    // Ein bestimmter Teilnehmer wird aus der combatTeilnehmer Liste entfernt
+    // Es wird ein ganz neues Array erstellt, dass nur den entfernten TN nicht
+    // mehr hält. Das neue Array überschreibt das alte
+    removeTeilnehmer(teilnehmer: Teilnehmer) {
+        let tempCombatTeilnehmer: Teilnehmer[] = [];
+        let index = 0;
+        for (index; index < this.combatTeilnehmer.length; index++) {
+            if (this.combatTeilnehmer[index] === teilnehmer) {
+                continue;
+            } else {
+                tempCombatTeilnehmer.push(this.combatTeilnehmer[index]!);
+            }
+        }
+        this.combatTeilnehmer = tempCombatTeilnehmer;
+    }
+
     getTeilnehmer(): Teilnehmer[] {
         return this.combatTeilnehmer;
     }

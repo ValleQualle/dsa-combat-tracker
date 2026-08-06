@@ -147,6 +147,8 @@ export class CombatView extends ItemView {
         singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.ini), cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "ini"}});
         singleTeilnehmerRow.createEl('div', {text: teilnehmer.name, cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "name"}});
         singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.leben), cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "leben"}});
+        singleTeilnehmerRow.createEl('button', {cls: 'removeTeilnehmerButton'});
+        
         // Neuer Teilnehmer wird in die HTMLElements Liste aufgenommen
         this.htmlElementeTeilnehmerListe.push(singleTeilnehmerRow);
     } 

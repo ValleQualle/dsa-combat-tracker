@@ -4,7 +4,7 @@
   justify-content: flex-start;
   border: 1px solid var(--background-modifier-border);
   padding: 2px;
-  margin-bottom: 5px;
+  /*margin-bottom: 5px;*/
 }
 
 .addTeilnehmerButton {
@@ -51,15 +51,28 @@
 
 .teilnehmerViewLayoutSingleRow {
   display: grid;
-  grid-template-columns: 1fr 3fr 1fr;
+  grid-template-columns: 1fr 3fr 1fr 0.1fr;
+  align-items: center;
+}
+
+.removeTeilnehmerButton {
+  justify-self: center;
+  align-self: center;
+  margin: 2px;
+  height: 80%;
+  width: 80%;
+}
+
+.removeTeilnehmerButton:hover {
+  background-color: #730E0E;
 }
 
 .teilnehmerViewAttribute {
   border: 1px solid var(--background-modifier-border);
+  text-align: center;
   margin: 2px;
   margin-top: 3px;
   margin-bottom: 3px;
-  text-align: center;
 }
 
 .highlight {
