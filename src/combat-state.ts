@@ -5,7 +5,7 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
     private combatTeilnehmer: Teilnehmer[] = [];
     private globalTeilnehmerCount: number = 0;
     // Hier muss die teilnehmerID genutzt werden. In der Liste suchen und dann Highlighten?
-    private activeTeilnehmerID: number = -1; // Der Index des Teilnehmers, der gerade gehighlightet ist
+    private activeTeilnehmerID: number = -1;
     
     defaultTeilnehmerArray(): void {
         this.combatTeilnehmer.push({teilnehmerId: 1, ini: 15, name: "Alice", leben: 10});
@@ -32,7 +32,7 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
         return this.combatTeilnehmer.sort((a, b) => b.ini - a.ini); // Absteigende Sortierung
     }
 
-    updateEditedField(field: string, newInputValue: string, id: number): void {
+    updateEditedField(field: string | null, newInputValue: string, id: number): void {
         // sucht den alten Wert aus dem Array und erstzt ihn durch den neuen Wert
         // noch unsicher, wie ich die Daten raussuche.. am besten Index für ELement angeben. Aber wie? 
         let foundTeilnehmer = this.combatTeilnehmer.find(Teilnehmer => Teilnehmer.teilnehmerId == Number(id));
@@ -63,12 +63,15 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
             throw new Error('Keinen Teilnehmer gefunden. (combat-state / nextCombatTeilnehmer())');
         }
          // Kein aktiver Teilnehmer, also Anfang der Liste beginnen activeTeilnehmerIndex = 0
-         // Hier kann als Erweiterung später noch geschaut werden, ob leben > 0 ist, sonst
-         // kann der Entrag übersprungen werden
         if (this.activeTeilnehmerID === -1 && !this.isCombatTeilnehmerEmpty()) {
             this.activeTeilnehmerID = this.combatTeilnehmer[0]!.teilnehmerId;
+        // Eine do-while-Schleife wählt so lange den nächsten TN aus, bis einer > 0 Leben besitzt
         } else {
-            this.activeTeilnehmerID = this.combatTeilnehmer[(this.getActiveTeilnehmerIndex() + 1) % this.globalTeilnehmerCount]!.teilnehmerId;
+            let counter = 0;
+            do {
+                counter++;
+                this.activeTeilnehmerID = this.combatTeilnehmer[(this.getActiveTeilnehmerIndex() + 1) % this.globalTeilnehmerCount]!.teilnehmerId;
+            } while ((this.combatTeilnehmer[this.getActiveTeilnehmerIndex()]!.leben <= 0) && (counter <= this.globalTeilnehmerCount));
         }
         
     }
