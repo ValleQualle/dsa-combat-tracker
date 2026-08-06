@@ -2,10 +2,15 @@ import { Teilnehmer } from './types';
 import { Notice } from 'obsidian';
 
 export class CombatState { // Erbt von nichts, da kein View oder Plugin
+    // Das Array, was die Teilnehmer als Objekte hält
     private combatTeilnehmer: Teilnehmer[] = [];
+    // Anzahl der Teilnehmer im gesamten Combat
     private globalTeilnehmerCount: number = 0;
-    // Hier muss die teilnehmerID genutzt werden. In der Liste suchen und dann Highlighten?
+    // Ein TEMPORÄRER Speicher für die Bearbeitung des aktuellen Teilnehmers
     private activeTeilnehmerID: number = -1;
+    // Variable, die die letzte vergebene ID hält, um dem nächsten Teilnehmer
+    // eine eindeutige Nummer geben zu können
+    private newTeilnehmerID: number = 0;
     
     defaultTeilnehmerArray(): void {
         this.combatTeilnehmer.push({teilnehmerId: 1, ini: 15, name: "Alice", leben: 10});
@@ -18,7 +23,8 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
         if (this.activeTeilnehmerID === -1) {
             this.activeTeilnehmerID = newTeilnehmer.teilnehmerId;
         }
-        newTeilnehmer.teilnehmerId = this.globalTeilnehmerCount + 1;
+        newTeilnehmer.teilnehmerId = this.newTeilnehmerID + 1;
+        this.newTeilnehmerID++;
         this.globalTeilnehmerCount = this.globalTeilnehmerCount + 1;
         this.combatTeilnehmer.push(newTeilnehmer);
         this.sortTeilnehmer();
