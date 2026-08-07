@@ -20,9 +20,6 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
     }
 
     addTeilnehmer(newTeilnehmer: Teilnehmer): void {
-        if (this.activeTeilnehmerID === -1) {
-            this.activeTeilnehmerID = newTeilnehmer.teilnehmerId;
-        }
         newTeilnehmer.teilnehmerId = this.newTeilnehmerID + 1;
         this.newTeilnehmerID++;
         this.globalTeilnehmerCount = this.globalTeilnehmerCount + 1;
@@ -33,16 +30,17 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
     // Ein bestimmter Teilnehmer wird aus der combatTeilnehmer Liste entfernt
     // Es wird ein ganz neues Array erstellt, dass nur den entfernten TN nicht
     // mehr hält. Das neue Array überschreibt das alte
-    removeTeilnehmer(teilnehmer: Teilnehmer) {
+    removeTeilnehmer(teilnehmer: number) {
         let tempCombatTeilnehmer: Teilnehmer[] = [];
         let index = 0;
         for (index; index < this.combatTeilnehmer.length; index++) {
-            if (this.combatTeilnehmer[index] === teilnehmer) {
+            if (this.combatTeilnehmer[index]!.teilnehmerId === teilnehmer) {
                 continue;
             } else {
                 tempCombatTeilnehmer.push(this.combatTeilnehmer[index]!);
             }
         }
+        this.globalTeilnehmerCount--;
         this.combatTeilnehmer = tempCombatTeilnehmer;
     }
 
@@ -85,7 +83,7 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
             throw new Error('Keinen Teilnehmer gefunden. (combat-state / nextCombatTeilnehmer())');
         }
          // Kein aktiver Teilnehmer, also Anfang der Liste beginnen activeTeilnehmerIndex = 0
-        if (this.activeTeilnehmerID === -1 && !this.isCombatTeilnehmerEmpty()) {
+        if ((this.activeTeilnehmerID === -1)) {
             this.activeTeilnehmerID = this.combatTeilnehmer[0]!.teilnehmerId;
         // Eine do-while-Schleife wählt so lange den nächsten TN aus, bis einer > 0 Leben besitzt
         } else {
