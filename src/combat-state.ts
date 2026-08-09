@@ -44,6 +44,14 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
         this.combatTeilnehmer = tempCombatTeilnehmer;
     }
 
+    // Alle Teilnehmer werden aus der combatTeilnehmer Liste entfernt
+    // activeTeilnehmerID wird wieder auf -1 zurückgesetzt
+    removeAllTeilnehmer() {
+        this.combatTeilnehmer = [];
+        this.activeTeilnehmerID = -1;
+        this.globalTeilnehmerCount = 0;
+    }
+
     getTeilnehmer(): Teilnehmer[] {
         return this.combatTeilnehmer;
     }

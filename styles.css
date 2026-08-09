@@ -35,7 +35,8 @@
 
 .combatViewUeberschriftenLayout {
   display: grid;
-  grid-template-columns: 1fr 3fr 1fr;
+  grid-template-columns: 1fr 3fr 1fr 0.1fr;
+  align-items: center;
 }
 
 .combatViewUeberschriftenAttribute {
@@ -64,6 +65,19 @@
 }
 
 .removeTeilnehmerButton:hover {
+  background-color: #730E0E;
+}
+
+.removeAllTeilnehmerButton {
+  justify-self: left;
+  align-self: center;
+  margin: 2px;
+  height: 60%;
+  width: 10%;
+  margin: 5px;
+}
+
+.removeAllTeilnehmerButton:hover {
   background-color: #730E0E;
 }
 

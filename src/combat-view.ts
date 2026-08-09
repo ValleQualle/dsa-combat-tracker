@@ -1,5 +1,6 @@
-import { ItemView, WorkspaceLeaf, Notice, setIcon } from 'obsidian';
-import { AddPlayerModal  } from 'add-modal';
+import { ItemView, WorkspaceLeaf, Notice, setIcon, setTooltip } from 'obsidian';
+import { AddPlayerModal  } from 'modals/add-modal';
+import { BooleanChoiceModal } from 'modals/booleanChoice-modal';
 import DSACombatTracker from './main';
 import { Teilnehmer } from './types';
 import { CombatState } from 'combat-state';
@@ -70,6 +71,19 @@ export class CombatView extends ItemView {
         this.renderCombatList();
       }).open();
     };
+    // Der Button, der alle Teilnehmer aus der combatTeilnehmer Liste entfernen lässt
+    const removeAllTeilnehmerButton = saveTeilnehmerButton.createEl('button', {cls: 'removeAllTeilnehmerButton'});
+    setIcon(removeAllTeilnehmerButton, 'trash-2');
+    setTooltip(removeAllTeilnehmerButton, 'Entfernt alle Teilnehmer');
+    removeAllTeilnehmerButton.addEventListener("click", () => {
+      new BooleanChoiceModal(this.app, (result) => {
+        if (result) {
+          this.state.removeAllTeilnehmer();
+          this.renderCombatList();
+        }
+      }).open();
+      
+    });
 
 
     // Der Play-Button, der den Verlauf des Combats um einen Mitspieler weiter verschiebt.
