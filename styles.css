@@ -7,17 +7,7 @@
   /*margin-bottom: 5px;*/
 }
 
-.addTeilnehmerButton {
-  float: right;
-  margin: 5px;
-}
-
-.addTeilnehmerButton:hover {
-  background-color: #6437cc;
-}
-
 .addTeilnehmerModalSaveButton {
-  float: right;
   margin: 5px;
 }
 
@@ -33,14 +23,63 @@
   background-color: #6437cc;
 }
 
+.buttonBarLayout {
+  display: grid;
+  grid-template-columns: 1fr 3fr 1fr;
+  margin: 2px;
+  margin-bottom: 5px;
+}
+
+.buttonBarLeft {
+  align-content: center;
+  justify-content: end;
+}
+
+.removeAllTeilnehmerButton {
+  margin: 5px;
+}
+
+.removeAllTeilnehmerButton:hover {
+  background-color: #730E0E;
+}
+
+.buttonBarCenter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.combatRoundCounter {
+  border: 3px solid var(--background-modifier-border);
+  text-align: center;
+  width: fit-content;
+  padding: 3px;
+}
+
+.buttonBarRight {
+  display: flex;
+  flex-direction: row-reverse;
+  align-content: center;
+}
+
+.addTeilnehmerButton {
+  margin: 5px;
+}
+
+.addTeilnehmerButton:hover {
+  background-color: #6437cc;
+}
+
 .combatViewUeberschriftenLayout {
   display: grid;
-  grid-template-columns: 1fr 3fr 1fr 0.1fr;
+  grid-template-columns: 1fr 3fr 1fr 0.2fr;
   align-items: center;
 }
 
 .combatViewUeberschriftenAttribute {
   text-align: center;
+  justify-content: center;
+  align-items: center;
   font-size: 16px;
   font-weight: 800;
 }
@@ -65,19 +104,6 @@
 }
 
 .removeTeilnehmerButton:hover {
-  background-color: #730E0E;
-}
-
-.removeAllTeilnehmerButton {
-  justify-self: left;
-  align-self: center;
-  margin: 2px;
-  height: 60%;
-  width: 10%;
-  margin: 5px;
-}
-
-.removeAllTeilnehmerButton:hover {
   background-color: #730E0E;
 }
 

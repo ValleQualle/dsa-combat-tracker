@@ -29,8 +29,64 @@ export class CombatView extends ItemView {
   }
 
   async onOpen() {
+    // Titel der Combat View Seite
     this.container.empty();
     this.container.createEl('h4', { text: 'Combat view' });
+
+    // Button Leiste über der combatList
+    const buttonBar = this.container.createEl('div', {cls: 'buttonBarLayout'});
+    // Divs zur Aufteilung der ButtonBar (Links, Mitte, Rechts)
+    const buttonBarLeftDiv = buttonBar.createEl('div', {cls: 'buttonBarLeft'});
+    const buttonBarCenterDiv = buttonBar.createEl('div', {cls: 'buttonBarCenter'});
+    const buttonBarRightDiv = buttonBar.createEl('div', {cls: 'buttonBarRight'});
+    
+    // Legt ein vorgefertigtes Array an -> für Dev purposes
+    // this.state.defaultTeilnehmerArray();
+
+    // Der Button, der alle Teilnehmer aus der combatTeilnehmer Liste entfernen lässt
+    const removeAllTeilnehmerButton = buttonBarLeftDiv.createEl('button', {cls: 'removeAllTeilnehmerButton'});
+    setIcon(removeAllTeilnehmerButton, 'trash-2');
+    setTooltip(removeAllTeilnehmerButton, 'Entfernt alle Teilnehmer');
+    removeAllTeilnehmerButton.addEventListener("click", () => {
+      new BooleanChoiceModal(this.app, (result) => {
+        if (result) {
+          this.state.removeAllTeilnehmer();
+          this.renderCombatList();
+        }
+      }).open();
+    });
+
+    // Der Kampfrundenanzeiger
+    let combatRound = buttonBarCenterDiv.createEl('div', {text: 'Runde', cls: 'combatRoundCounter'});
+
+    // Der Play-Button, der den Verlauf des Combats um einen Mitspieler weiter verschiebt.
+    let playTeilnehmerButton = buttonBarRightDiv.createEl('button', {cls: 'addTeilnehmerButton'});
+    setIcon(playTeilnehmerButton, 'play');
+    setTooltip(playTeilnehmerButton, 'Wählt den nächsten Teilnehmer aus');
+    playTeilnehmerButton.onclick = (evt: MouseEvent) => {
+      // Die background-color des nächsten Eintrages wird auf die highlight-color gesetzt
+      // Die background-color des vorherigen Eintrages wird auf none gesetzt
+      if (this.state.isCombatTeilnehmerEmpty()) { // Die Liste ist leer
+        new Notice("Noch Keine Combat-Teilnehmer");
+        return;
+      } else {
+        this.state.nextCombatTeilnehmer();
+        this.updateHighlight(this.state.getActiveTeilnehmerIndex());
+      }
+    };
+
+    // Ein neuer Teilnehmer kann durch diesen Button über ein PopUp (Modal) hinzugefügt werden
+    let addTeilnehmerButton = buttonBarRightDiv.createEl('button', {cls: 'addTeilnehmerButton'});
+    setIcon(addTeilnehmerButton, 'list-plus');
+    setTooltip(addTeilnehmerButton, 'Fügt einen neuen Teilnehmer hinzu')
+    addTeilnehmerButton.onclick = (evt: MouseEvent) => {
+      new AddPlayerModal(this.app, (neuerTeilnehmer: Teilnehmer) => {
+        this.state.addTeilnehmer(neuerTeilnehmer);
+        this.teilnehmerCollectionDiv.empty();
+      
+        this.renderCombatList();
+      }).open();
+    };
 
     // Statische Darstellung der in den divs angezeigten Werten
     const ueberschriften = this.container.createEl('div', {cls: "combatViewUeberschriftenLayout"});
@@ -52,52 +108,6 @@ export class CombatView extends ItemView {
         return;
       } else {
         this.makeEditable(currentElement, cell, currentText);
-      }
-    };
-
-    
-    // Neuer Div für Button erstellt, damit beim neu Rendern des Arrays der Button unangetastet bleibt. 
-    const saveTeilnehmerButton = this.container.createEl('div');
-    // Legt ein vorgefertigtes Array an -> für Dev purposes
-    // this.state.defaultTeilnehmerArray();
-
-    // Ein neuer Teilnehmer kann durch diesen Button über ein PopUp (Modal) hinzugefügt werden
-    let addTeilnehmerButton = saveTeilnehmerButton.createEl('button', {text: 'Add', cls: 'addTeilnehmerButton'});
-    addTeilnehmerButton.onclick = (evt: MouseEvent) => {
-      new AddPlayerModal(this.app, (neuerTeilnehmer: Teilnehmer) => {
-        this.state.addTeilnehmer(neuerTeilnehmer);
-        this.teilnehmerCollectionDiv.empty();
-      
-        this.renderCombatList();
-      }).open();
-    };
-    // Der Button, der alle Teilnehmer aus der combatTeilnehmer Liste entfernen lässt
-    const removeAllTeilnehmerButton = saveTeilnehmerButton.createEl('button', {cls: 'removeAllTeilnehmerButton'});
-    setIcon(removeAllTeilnehmerButton, 'trash-2');
-    setTooltip(removeAllTeilnehmerButton, 'Entfernt alle Teilnehmer');
-    removeAllTeilnehmerButton.addEventListener("click", () => {
-      new BooleanChoiceModal(this.app, (result) => {
-        if (result) {
-          this.state.removeAllTeilnehmer();
-          this.renderCombatList();
-        }
-      }).open();
-      
-    });
-
-
-    // Der Play-Button, der den Verlauf des Combats um einen Mitspieler weiter verschiebt.
-    let playTeilnehmerButton = saveTeilnehmerButton.createEl('button', {cls: 'addTeilnehmerButton'});
-    setIcon(playTeilnehmerButton, 'arrow-big-right-dash');
-    playTeilnehmerButton.onclick = (evt: MouseEvent) => {
-      // Die background-color des nächsten Eintrages wird auf die highlight-color gesetzt
-      // Die background-color des vorherigen Eintrages wird auf none gesetzt
-      if (this.state.isCombatTeilnehmerEmpty()) { // Die Liste ist leer
-        new Notice("Noch Keine Combat-Teilnehmer");
-        return;
-      } else {
-        this.state.nextCombatTeilnehmer();
-        this.updateHighlight(this.state.getActiveTeilnehmerIndex());
       }
     };
   }
