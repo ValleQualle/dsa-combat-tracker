@@ -1,4 +1,4 @@
-import {App, Editor, MarkdownView, Modal, Notice, Plugin} from 'obsidian';
+import {App, Editor, MarkdownView, Modal, Notice, Plugin, WorkspaceLeaf} from 'obsidian';
 import {DEFAULT_SETTINGS, MyPluginSettings, SampleSettingTab} from "./settings";
 import { CombatView, VIEW_TYPE_EXAMPLE } from './combat-view';
 // import DSACombatTracker from './main';
@@ -100,16 +100,16 @@ export default class DSACombatTracker extends Plugin {
 
 		if (leaves.length > 0) {
 			// A leaf already exists, use that
-			leaf = leaves[0];
+			leaf = leaves[0]!;
 		} else {
 			// View doesn't exist yet, create new leaf
 			// in the right sidebar
 			leaf = workspace.getRightLeaf(false);
-			await leaf.setViewState({ type: VIEW_TYPE_EXAMPLE, active: true});
+			await leaf!.setViewState({ type: VIEW_TYPE_EXAMPLE, active: true});
 		}
 
 		// Reveal leaf in sidebar in case it's collapsed
-		workspace.revealLeaf(leaf);
+		workspace.revealLeaf(leaf!);
 	}
 
 	async loadSettings() {

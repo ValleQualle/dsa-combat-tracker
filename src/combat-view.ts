@@ -130,7 +130,7 @@ export class CombatView extends ItemView {
     let field = currentElement.getAttribute('data-div-type'); // Das Feld, was angeklickt wurde
 
     const input = cell.createEl("input", {
-      value: cell.textContent,
+      value: cell.textContent ?? undefined,
       cls: "teilnehmerViewAttributeInput",
     });
 
