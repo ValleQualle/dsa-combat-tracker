@@ -107,7 +107,7 @@ export class CombatView extends ItemView {
       // Merken der initialen Eingabe zur Übergabe an Combat-State
       const currentElement = evt.target as HTMLElement;
       const cell = currentElement.closest(".editable"); // div, der bearbeitet werden soll
-      let currentText = cell?.textContent;
+      let currentText = cell!.textContent;
 
       // Umwandlung des geklickten div in input-Feld
       if (cell == null) {
