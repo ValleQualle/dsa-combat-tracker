@@ -1,7 +1,6 @@
 import { ItemView, WorkspaceLeaf, Notice, setIcon, setTooltip } from 'obsidian';
 import { AddPlayerModal  } from 'modals/add-modal';
 import { BooleanChoiceModal } from 'modals/booleanChoice-modal';
-import DSACombatTracker from './main';
 import { Teilnehmer } from './types';
 import { CombatState } from 'combat-state';
 
@@ -73,7 +72,7 @@ export class CombatView extends ItemView {
       // Die background-color des nächsten Eintrages wird auf die highlight-color gesetzt
       // Die background-color des vorherigen Eintrages wird auf none gesetzt
       if (this.state.isCombatTeilnehmerEmpty()) { // Die Liste ist leer
-        new Notice("Noch Keine Combat-Teilnehmer");
+        new Notice("Noch keine Combat-Teilnehmer");
         return;
       } else {
         this.state.nextCombatTeilnehmer();

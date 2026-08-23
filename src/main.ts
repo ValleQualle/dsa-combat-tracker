@@ -1,12 +1,12 @@
 import {App, Editor, MarkdownView, Modal, Notice, Plugin, WorkspaceLeaf} from 'obsidian';
-import {DEFAULT_SETTINGS, MyPluginSettings, SampleSettingTab} from "./settings";
+import {DEFAULT_SETTINGS, DSACombatTrackerSettings, DSACombatTrackerSettingTab} from "./settings";
 import { CombatView, VIEW_TYPE_EXAMPLE } from './combat-view';
 // import DSACombatTracker from './main';
 
 // Remember to rename these classes and interfaces!
 
 export default class DSACombatTracker extends Plugin {
-	settings: MyPluginSettings;
+	settings: DSACombatTrackerSettings;
 
 	async onload() {
 		await this.loadSettings();
@@ -21,28 +21,19 @@ export default class DSACombatTracker extends Plugin {
 			// Called when the user clicks the icon.
 			// new Notice('This is a notice!');
 			// Öffnet neues Fenster des Plugins? -valle
-			this.activateView();
+			void this.activateView();
 		});
 
 		// Zeigt alle Leaves im workspace an
 		this.addRibbonIcon('dice', 'Print leaf types', () => {
 			this.app.workspace.iterateAllLeaves((leaf) => {
-				console.log(leaf.getViewState().type);
+				console.debug(leaf.getViewState().type);
 			});
 		});
 
 		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
 		const statusBarItemEl = this.addStatusBarItem();
 		statusBarItemEl.setText('Status bar text');
-
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: 'open-modal-simple',
-			name: 'Open modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
-			}
-		});
 		// This adds an editor command that can perform some operation on the current editor instance
 		this.addCommand({
 			id: 'replace-selected',
@@ -51,29 +42,9 @@ export default class DSACombatTracker extends Plugin {
 				editor.replaceSelection('Sample editor command');
 			}
 		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-modal-complex',
-			name: 'Open modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
-				return false;
-			}
-		});
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+		this.addSettingTab(new DSACombatTrackerSettingTab(this.app, this));
 
 		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
 		// Using this function will automatically remove the event listener when this plugin is disabled.
@@ -86,7 +57,7 @@ export default class DSACombatTracker extends Plugin {
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		//this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 
-		console.log("DSA Combat Tracker geladen");
+		console.debug("DSA Combat Tracker geladen");
 	}
 
 	onunload() {
@@ -109,11 +80,11 @@ export default class DSACombatTracker extends Plugin {
 		}
 
 		// Reveal leaf in sidebar in case it's collapsed
-		workspace.revealLeaf(leaf!);
+		void workspace.revealLeaf(leaf!);
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<MyPluginSettings>);
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<DSACombatTrackerSettings>);
 	}
 
 	async saveSettings() {
@@ -122,20 +93,4 @@ export default class DSACombatTracker extends Plugin {
 
 	// implementierung der öffnung der View
 
-}
-
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		let {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
 }

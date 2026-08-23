@@ -31,4 +31,9 @@ export default tseslint.config(
 		"versions.json",
 		"main.js",
 	]),
+	{
+		rules: {
+			"obsidianmd/ui/sentence-case": "off",
+		}
+	},
 );

@@ -1,5 +1,5 @@
 import { Teilnehmer } from './types';
-import { Events, Notice } from 'obsidian';
+import { Events } from 'obsidian';
 
 export class CombatState extends Events { // Erbt von nichts, da kein View oder Plugin
     // Das Array, was die Teilnehmer als Objekte hält
