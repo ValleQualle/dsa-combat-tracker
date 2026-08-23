@@ -1,7 +1,7 @@
 import { Teilnehmer } from './types';
-import { Notice } from 'obsidian';
+import { Events, Notice } from 'obsidian';
 
-export class CombatState { // Erbt von nichts, da kein View oder Plugin
+export class CombatState extends Events { // Erbt von nichts, da kein View oder Plugin
     // Das Array, was die Teilnehmer als Objekte hält
     private combatTeilnehmer: Teilnehmer[] = [];
     // Anzahl der Teilnehmer im gesamten Combat
@@ -11,6 +11,8 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
     // Variable, die die letzte vergebene ID hält, um dem nächsten Teilnehmer
     // eine eindeutige Nummer geben zu können
     private newTeilnehmerID: number = 0;
+    // Die Variable, die für das Zählen der Spielrunden verantwortlich ist
+    private roundCounter: number = 0;
     
     defaultTeilnehmerArray(): void {
         this.combatTeilnehmer.push({teilnehmerId: 1, ini: 15, name: "Alice", leben: 10});
@@ -50,6 +52,7 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
         this.combatTeilnehmer = [];
         this.activeTeilnehmerID = -1;
         this.globalTeilnehmerCount = 0;
+        this.roundCounter = 0;
     }
 
     getTeilnehmer(): Teilnehmer[] {
@@ -99,9 +102,20 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
             do {
                 counter++;
                 this.activeTeilnehmerID = this.combatTeilnehmer[(this.getActiveTeilnehmerIndex() + 1) % this.globalTeilnehmerCount]!.teilnehmerId;
+                // Der Rundenzähler wird erhöht, wenn der counter == globalTeilnehmerCoun
+                if (this.getActiveTeilnehmerIndex() === 0) {
+                    this.updateRoundCounter();
+                }
             } while ((this.combatTeilnehmer[this.getActiveTeilnehmerIndex()]!.leben <= 0) && (counter <= this.globalTeilnehmerCount));
         }
-        
+    }
+
+    // Wenn alle Teilnehmer der combatListe durchgegangen sind, 
+    // wird der Rundenzähler um einen erhöht
+    updateRoundCounter(): void {
+        this.roundCounter++;
+        // Ein Event, auf dass die view abboniert und dann einen neuen render triggert
+        this.trigger("round-update");
     }
 
     isCombatTeilnehmerEmpty(): boolean {
@@ -123,5 +137,9 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
             }
         }
         return -1;
+    }
+
+    getRoundCounter(): number {
+        return this.roundCounter;
     }
 }

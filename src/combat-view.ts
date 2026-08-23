@@ -14,6 +14,8 @@ export class CombatView extends ItemView {
   private teilnehmerCollectionDiv!: HTMLElement;
   // Liste aller angezeigten HTMLElemente der Combat-Teilnehmer Liste
   private htmlElementeTeilnehmerListe: HTMLElement[] = [];
+  // Hält den div, der die Rundennummer hält
+  private combatRoundDiv!: HTMLElement;
 
   constructor(leaf: WorkspaceLeaf) {
     super(leaf);
@@ -52,12 +54,16 @@ export class CombatView extends ItemView {
         if (result) {
           this.state.removeAllTeilnehmer();
           this.renderCombatList();
+          this.renderRoundCounter();
         }
       }).open();
     });
 
     // Der Kampfrundenanzeiger
-    let combatRound = buttonBarCenterDiv.createEl('div', {text: 'Runde', cls: 'combatRoundCounter'});
+    this.combatRoundDiv = buttonBarCenterDiv.createEl('div', {text: '0', cls: 'combatRoundCounter'});
+    this.state.on("round-update", () => {
+      this.renderRoundCounter();
+    })
 
     // Der Play-Button, der den Verlauf des Combats um einen Mitspieler weiter verschiebt.
     let playTeilnehmerButton = buttonBarRightDiv.createEl('button', {cls: 'addTeilnehmerButton'});
@@ -205,5 +211,10 @@ export class CombatView extends ItemView {
         }
       });
     }
+  }
+
+  renderRoundCounter(): void {
+    // this.combatRoundDiv.empty();
+    this.combatRoundDiv.setText(String(this.state.getRoundCounter()));
   }
 }
