@@ -69,6 +69,10 @@ export class CombatView extends ItemView {
     setIcon(playTeilnehmerButton, 'play');
     setTooltip(playTeilnehmerButton, 'Wählt den nächsten Teilnehmer aus');
     playTeilnehmerButton.onclick = (evt: MouseEvent) => {
+      if (this.combatRoundDiv.style.borderColor != "") {
+        this.combatRoundDiv.style.borderColor = "";
+      }
+      
       // Die background-color des nächsten Eintrages wird auf die highlight-color gesetzt
       // Die background-color des vorherigen Eintrages wird auf none gesetzt
       if (this.state.isCombatTeilnehmerEmpty()) { // Die Liste ist leer
@@ -78,6 +82,11 @@ export class CombatView extends ItemView {
         this.state.nextCombatTeilnehmer();
         this.updateHighlight(this.state.getActiveTeilnehmerIndex());
       }
+
+      if (this.state.getRoundCounter() == 0) {
+        this.state.updateRoundCounter();
+        this.renderRoundCounter();
+      } 
     };
 
     // Ein neuer Teilnehmer kann durch diesen Button über ein PopUp (Modal) hinzugefügt werden
@@ -213,7 +222,7 @@ export class CombatView extends ItemView {
   }
 
   renderRoundCounter(): void {
-    // this.combatRoundDiv.empty();
     this.combatRoundDiv.setText(String(this.state.getRoundCounter()));
+    this.combatRoundDiv.style.borderColor = "#6437cc";
   }
 }
