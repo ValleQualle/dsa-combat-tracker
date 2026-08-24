@@ -54,14 +54,16 @@ export class CombatView extends ItemView {
           this.state.removeAllTeilnehmer();
           this.renderCombatList();
           this.renderRoundCounter();
+          this.combatRoundDiv.style.borderColor = "";
         }
       }).open();
     });
 
     // Der Kampfrundenanzeiger
-    this.combatRoundDiv = buttonBarCenterDiv.createEl('div', {text: '0', cls: 'combatRoundCounter'});
+    this.combatRoundDiv = buttonBarCenterDiv.createEl('div', {text: '0', cls: 'combatRoundCounter editable'});
     this.state.on("round-update", () => {
       this.renderRoundCounter();
+      this.highlightRoundCounter()
     })
 
     // Der Play-Button, der den Verlauf des Combats um einen Mitspieler weiter verschiebt.
@@ -86,6 +88,7 @@ export class CombatView extends ItemView {
       if (this.state.getRoundCounter() == 0) {
         this.state.updateRoundCounter();
         this.renderRoundCounter();
+        this.highlightRoundCounter()
       } 
     };
 
@@ -122,6 +125,18 @@ export class CombatView extends ItemView {
         return;
       } else {
         this.makeEditable(currentElement, cell, currentText);
+      }
+    };
+
+    this.combatRoundDiv.ondblclick = (evt: MouseEvent) => {
+      const cell = this.combatRoundDiv.closest(".editable"); // div, der bearbeitet werden soll
+      let currentText = cell!.textContent;
+
+      // Umwandlung des geklickten div in input-Feld
+      if (cell == null) {
+        return;
+      } else {
+        this.makeEditableRoundCounter(cell, currentText);
       }
     };
   }
@@ -175,6 +190,41 @@ export class CombatView extends ItemView {
     }
 
   }
+  
+  makeEditableRoundCounter(cell: Element, currentRound: string | null): void {
+    cell.empty();
+
+    const input = cell.createEl("input", {
+      value: cell.textContent ?? undefined,
+      cls: "teilnehmerViewAttributeInput",
+    });
+
+    // Direktes Anwählen des input Feldes
+    input.focus();
+
+    // EventListener zur Entscheidung, ob Eingabe gespeichert oder verworfen werden soll
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { 
+
+        currentRound = input.value;
+        
+        this.state.updateRoundCounterFromEditedField(Number(currentRound));
+        this.renderRoundCounter();
+      }
+      if (e.key === "Escape") cancel();
+    });
+
+    input.addEventListener("blur", () => {
+      // Wenn nichts im input steht => Wiederherstellung der letzten Eingabe
+        cancel();
+    });
+
+    // Der Text im div wird wieder auf den vorherigen Wert gesetzt
+    const cancel = () => {
+      cell.textContent = currentRound;
+    }
+
+  }
 
   renderCombatList(): void {
     this.teilnehmerCollectionDiv.empty();
@@ -223,6 +273,9 @@ export class CombatView extends ItemView {
 
   renderRoundCounter(): void {
     this.combatRoundDiv.setText(String(this.state.getRoundCounter()));
+  }
+
+  highlightRoundCounter(): void {
     this.combatRoundDiv.style.borderColor = "#6437cc";
   }
 }

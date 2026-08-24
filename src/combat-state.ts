@@ -1,5 +1,5 @@
 import { Teilnehmer } from './types';
-import { Events } from 'obsidian';
+import { Events, Notice } from 'obsidian';
 
 export class CombatState extends Events { // Erbt von nichts, da kein View oder Plugin
     // Das Array, was die Teilnehmer als Objekte hält
@@ -116,6 +116,11 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
         this.roundCounter++;
         // Ein Event, auf dass die view abboniert und dann einen neuen render triggert
         this.trigger("round-update");
+    }
+
+    updateRoundCounterFromEditedField(newRoundNumber: number): void {
+        this.roundCounter = newRoundNumber;
+        new Notice("In state: " + this.roundCounter);
     }
 
     isCombatTeilnehmerEmpty(): boolean {
