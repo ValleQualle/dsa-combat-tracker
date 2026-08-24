@@ -54,7 +54,9 @@ export class CombatView extends ItemView {
           this.state.removeAllTeilnehmer();
           this.renderCombatList();
           this.renderRoundCounter();
-          this.combatRoundDiv.style.borderColor = "";
+          this.combatRoundDiv.setCssProps({
+            "border-color": ""
+          });
         }
       }).open();
     });
@@ -72,7 +74,9 @@ export class CombatView extends ItemView {
     setTooltip(playTeilnehmerButton, 'Wählt den nächsten Teilnehmer aus');
     playTeilnehmerButton.onclick = (evt: MouseEvent) => {
       if (this.combatRoundDiv.style.borderColor != "") {
-        this.combatRoundDiv.style.borderColor = "";
+        this.combatRoundDiv.setCssProps({
+          "border-color": ""
+        });
       }
       
       // Die background-color des nächsten Eintrages wird auf die highlight-color gesetzt
@@ -276,6 +280,8 @@ export class CombatView extends ItemView {
   }
 
   highlightRoundCounter(): void {
-    this.combatRoundDiv.style.borderColor = "#6437cc";
+    this.combatRoundDiv.setCssProps({
+      "border-color": "#6437cc"
+    });
   }
 }
