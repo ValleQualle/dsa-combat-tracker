@@ -4,20 +4,10 @@
   justify-content: flex-start;
   border: 1px solid var(--background-modifier-border);
   padding: 2px;
-  margin-bottom: 5px;
-}
-
-.addTeilnehmerButton {
-  float: right;
-  margin: 5px;
-}
-
-.addTeilnehmerButton:hover {
-  background-color: #6437cc;
+  /*margin-bottom: 5px;*/
 }
 
 .addTeilnehmerModalSaveButton {
-  float: right;
   margin: 5px;
 }
 
@@ -33,13 +23,63 @@
   background-color: #6437cc;
 }
 
-.combatViewUeberschriftenLayout {
+.buttonBarLayout {
   display: grid;
   grid-template-columns: 1fr 3fr 1fr;
+  margin: 2px;
+  margin-bottom: 5px;
+}
+
+.buttonBarLeft {
+  align-content: center;
+  justify-content: end;
+}
+
+.removeAllTeilnehmerButton {
+  margin: 5px;
+}
+
+.removeAllTeilnehmerButton:hover {
+  background-color: #730E0E;
+}
+
+.buttonBarCenter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.combatRoundCounter {
+  border: 3px solid var(--background-modifier-border); 
+  text-align: center;
+  width: fit-content;
+  padding: 3px;
+}
+
+.buttonBarRight {
+  display: flex;
+  flex-direction: row-reverse;
+  align-content: center;
+}
+
+.addTeilnehmerButton {
+  margin: 5px;
+}
+
+.addTeilnehmerButton:hover {
+  background-color: #6437cc;
+}
+
+.combatViewUeberschriftenLayout {
+  display: grid;
+  grid-template-columns: 1fr 3fr 1fr 0.2fr;
+  align-items: center;
 }
 
 .combatViewUeberschriftenAttribute {
   text-align: center;
+  justify-content: center;
+  align-items: center;
   font-size: 16px;
   font-weight: 800;
 }
@@ -51,15 +91,28 @@
 
 .teilnehmerViewLayoutSingleRow {
   display: grid;
-  grid-template-columns: 1fr 3fr 1fr;
+  grid-template-columns: 1fr 3fr 1fr 0.1fr;
+  align-items: center;
+}
+
+.removeTeilnehmerButton {
+  justify-self: center;
+  align-self: center;
+  margin: 2px;
+  height: 80%;
+  width: 80%;
+}
+
+.removeTeilnehmerButton:hover {
+  background-color: #730E0E;
 }
 
 .teilnehmerViewAttribute {
   border: 1px solid var(--background-modifier-border);
+  text-align: center;
   margin: 2px;
   margin-top: 3px;
   margin-bottom: 3px;
-  text-align: center;
 }
 
 .highlight {

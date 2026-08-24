@@ -1,6 +1,6 @@
 import { App, Modal } from 'obsidian';
 import { CombatView } from 'combat-view';
-import DSACombatTracker from './main';
+import DSACombatTracker from '../main';
 import { Teilnehmer } from 'types';
 
 export class AddPlayerModal extends Modal {
@@ -44,6 +44,7 @@ export class AddPlayerModal extends Modal {
 
         saveButton.onclick = () => {
             const neuerTeilnehmer: Teilnehmer = {
+                teilnehmerId: -1, // Platzhalter, da die ID im state gesetzt wird
                 ini: Number(iniInput.value), // Number() hier ggf. noch mit NULL-Check ausstatten?
                 name: nameInput.value,
                 leben: Number(lebenInput.value) // Number() hier ggf. noch mit NULL-Check ausstatten?

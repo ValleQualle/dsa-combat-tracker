@@ -1,11 +1,18 @@
 import { Teilnehmer } from './types';
-import { Notice } from 'obsidian';
+import { Events, Notice } from 'obsidian';
 
-export class CombatState { // Erbt von nichts, da kein View oder Plugin
+export class CombatState extends Events { // Erbt von nichts, da kein View oder Plugin
+    // Das Array, was die Teilnehmer als Objekte hält
     private combatTeilnehmer: Teilnehmer[] = [];
+    // Anzahl der Teilnehmer im gesamten Combat
     private globalTeilnehmerCount: number = 0;
-    // Hier muss die teilnehmerID genutzt werden. In der Liste suchen und dann Highlighten?
+    // Ein TEMPORÄRER Speicher für die Bearbeitung des aktuellen Teilnehmers
     private activeTeilnehmerID: number = -1;
+    // Variable, die die letzte vergebene ID hält, um dem nächsten Teilnehmer
+    // eine eindeutige Nummer geben zu können
+    private newTeilnehmerID: number = 0;
+    // Die Variable, die für das Zählen der Spielrunden verantwortlich ist
+    private roundCounter: number = 0;
     
     defaultTeilnehmerArray(): void {
         this.combatTeilnehmer.push({teilnehmerId: 1, ini: 15, name: "Alice", leben: 10});
@@ -15,13 +22,37 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
     }
 
     addTeilnehmer(newTeilnehmer: Teilnehmer): void {
-        if (this.activeTeilnehmerID === -1) {
-            this.activeTeilnehmerID = newTeilnehmer.teilnehmerId;
-        }
-        newTeilnehmer.teilnehmerId = this.globalTeilnehmerCount + 1;
+        newTeilnehmer.teilnehmerId = this.newTeilnehmerID + 1;
+        this.newTeilnehmerID++;
         this.globalTeilnehmerCount = this.globalTeilnehmerCount + 1;
         this.combatTeilnehmer.push(newTeilnehmer);
         this.sortTeilnehmer();
+    }
+
+    // Ein bestimmter Teilnehmer wird aus der combatTeilnehmer Liste entfernt
+    // Es wird ein ganz neues Array erstellt, dass nur den entfernten TN nicht
+    // mehr hält. Das neue Array überschreibt das alte
+    removeTeilnehmer(teilnehmer: number) {
+        let tempCombatTeilnehmer: Teilnehmer[] = [];
+        let index = 0;
+        for (index; index < this.combatTeilnehmer.length; index++) {
+            if (this.combatTeilnehmer[index]!.teilnehmerId === teilnehmer) {
+                continue;
+            } else {
+                tempCombatTeilnehmer.push(this.combatTeilnehmer[index]!);
+            }
+        }
+        this.globalTeilnehmerCount--;
+        this.combatTeilnehmer = tempCombatTeilnehmer;
+    }
+
+    // Alle Teilnehmer werden aus der combatTeilnehmer Liste entfernt
+    // activeTeilnehmerID wird wieder auf -1 zurückgesetzt
+    removeAllTeilnehmer() {
+        this.combatTeilnehmer = [];
+        this.activeTeilnehmerID = -1;
+        this.globalTeilnehmerCount = 0;
+        this.roundCounter = 0;
     }
 
     getTeilnehmer(): Teilnehmer[] {
@@ -63,7 +94,7 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
             throw new Error('Keinen Teilnehmer gefunden. (combat-state / nextCombatTeilnehmer())');
         }
          // Kein aktiver Teilnehmer, also Anfang der Liste beginnen activeTeilnehmerIndex = 0
-        if (this.activeTeilnehmerID === -1 && !this.isCombatTeilnehmerEmpty()) {
+        if ((this.activeTeilnehmerID === -1)) {
             this.activeTeilnehmerID = this.combatTeilnehmer[0]!.teilnehmerId;
         // Eine do-while-Schleife wählt so lange den nächsten TN aus, bis einer > 0 Leben besitzt
         } else {
@@ -71,9 +102,25 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
             do {
                 counter++;
                 this.activeTeilnehmerID = this.combatTeilnehmer[(this.getActiveTeilnehmerIndex() + 1) % this.globalTeilnehmerCount]!.teilnehmerId;
+                // Der Rundenzähler wird erhöht, wenn der counter == globalTeilnehmerCoun
+                if (this.getActiveTeilnehmerIndex() === 0) {
+                    this.updateRoundCounter();
+                }
             } while ((this.combatTeilnehmer[this.getActiveTeilnehmerIndex()]!.leben <= 0) && (counter <= this.globalTeilnehmerCount));
         }
-        
+    }
+
+    // Wenn alle Teilnehmer der combatListe durchgegangen sind, 
+    // wird der Rundenzähler um einen erhöht
+    updateRoundCounter(): void {
+        this.roundCounter++;
+        // Ein Event, auf dass die view abboniert und dann einen neuen render triggert
+        this.trigger("round-update");
+    }
+
+    updateRoundCounterFromEditedField(newRoundNumber: number): void {
+        this.roundCounter = newRoundNumber;
+        new Notice("In state: " + this.roundCounter);
     }
 
     isCombatTeilnehmerEmpty(): boolean {
@@ -95,5 +142,9 @@ export class CombatState { // Erbt von nichts, da kein View oder Plugin
             }
         }
         return -1;
+    }
+
+    getRoundCounter(): number {
+        return this.roundCounter;
     }
 }

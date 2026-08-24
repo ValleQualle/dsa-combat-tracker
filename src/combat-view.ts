@@ -1,6 +1,6 @@
-import { ItemView, WorkspaceLeaf, Notice, setIcon } from 'obsidian';
-import { AddPlayerModal  } from 'add-modal';
-import DSACombatTracker from './main';
+import { ItemView, WorkspaceLeaf, Notice, setIcon, setTooltip } from 'obsidian';
+import { AddPlayerModal  } from 'modals/add-modal';
+import { BooleanChoiceModal } from 'modals/booleanChoice-modal';
 import { Teilnehmer } from './types';
 import { CombatState } from 'combat-state';
 
@@ -13,6 +13,8 @@ export class CombatView extends ItemView {
   private teilnehmerCollectionDiv!: HTMLElement;
   // Liste aller angezeigten HTMLElemente der Combat-Teilnehmer Liste
   private htmlElementeTeilnehmerListe: HTMLElement[] = [];
+  // Hält den div, der die Rundennummer hält
+  private combatRoundDiv!: HTMLElement;
 
   constructor(leaf: WorkspaceLeaf) {
     super(leaf);
@@ -28,8 +30,84 @@ export class CombatView extends ItemView {
   }
 
   async onOpen() {
+    // Titel der Combat View Seite
     this.container.empty();
     this.container.createEl('h4', { text: 'Combat view' });
+
+    // Button Leiste über der combatList
+    const buttonBar = this.container.createEl('div', {cls: 'buttonBarLayout'});
+    // Divs zur Aufteilung der ButtonBar (Links, Mitte, Rechts)
+    const buttonBarLeftDiv = buttonBar.createEl('div', {cls: 'buttonBarLeft'});
+    const buttonBarCenterDiv = buttonBar.createEl('div', {cls: 'buttonBarCenter'});
+    const buttonBarRightDiv = buttonBar.createEl('div', {cls: 'buttonBarRight'});
+    
+    // Legt ein vorgefertigtes Array an -> für Dev purposes
+    // this.state.defaultTeilnehmerArray();
+
+    // Der Button, der alle Teilnehmer aus der combatTeilnehmer Liste entfernen lässt
+    const removeAllTeilnehmerButton = buttonBarLeftDiv.createEl('button', {cls: 'removeAllTeilnehmerButton'});
+    setIcon(removeAllTeilnehmerButton, 'trash-2');
+    setTooltip(removeAllTeilnehmerButton, 'Entfernt alle Teilnehmer');
+    removeAllTeilnehmerButton.addEventListener("click", () => {
+      new BooleanChoiceModal(this.app, (result) => {
+        if (result) {
+          this.state.removeAllTeilnehmer();
+          this.renderCombatList();
+          this.renderRoundCounter();
+          this.combatRoundDiv.setCssProps({
+            "border-color": ""
+          });
+        }
+      }).open();
+    });
+
+    // Der Kampfrundenanzeiger
+    this.combatRoundDiv = buttonBarCenterDiv.createEl('div', {text: '0', cls: 'combatRoundCounter editable'});
+    this.state.on("round-update", () => {
+      this.renderRoundCounter();
+      this.highlightRoundCounter()
+    })
+
+    // Der Play-Button, der den Verlauf des Combats um einen Mitspieler weiter verschiebt.
+    let playTeilnehmerButton = buttonBarRightDiv.createEl('button', {cls: 'addTeilnehmerButton'});
+    setIcon(playTeilnehmerButton, 'play');
+    setTooltip(playTeilnehmerButton, 'Wählt den nächsten Teilnehmer aus');
+    playTeilnehmerButton.onclick = (evt: MouseEvent) => {
+      if (this.combatRoundDiv.style.borderColor != "") {
+        this.combatRoundDiv.setCssProps({
+          "border-color": ""
+        });
+      }
+      
+      // Die background-color des nächsten Eintrages wird auf die highlight-color gesetzt
+      // Die background-color des vorherigen Eintrages wird auf none gesetzt
+      if (this.state.isCombatTeilnehmerEmpty()) { // Die Liste ist leer
+        new Notice("Noch keine Combat-Teilnehmer");
+        return;
+      } else {
+        this.state.nextCombatTeilnehmer();
+        this.updateHighlight(this.state.getActiveTeilnehmerIndex());
+      }
+
+      if (this.state.getRoundCounter() == 0) {
+        this.state.updateRoundCounter();
+        this.renderRoundCounter();
+        this.highlightRoundCounter()
+      } 
+    };
+
+    // Ein neuer Teilnehmer kann durch diesen Button über ein PopUp (Modal) hinzugefügt werden
+    let addTeilnehmerButton = buttonBarRightDiv.createEl('button', {cls: 'addTeilnehmerButton'});
+    setIcon(addTeilnehmerButton, 'list-plus');
+    setTooltip(addTeilnehmerButton, 'Fügt einen neuen Teilnehmer hinzu')
+    addTeilnehmerButton.onclick = (evt: MouseEvent) => {
+      new AddPlayerModal(this.app, (neuerTeilnehmer: Teilnehmer) => {
+        this.state.addTeilnehmer(neuerTeilnehmer);
+        this.teilnehmerCollectionDiv.empty();
+      
+        this.renderCombatList();
+      }).open();
+    };
 
     // Statische Darstellung der in den divs angezeigten Werten
     const ueberschriften = this.container.createEl('div', {cls: "combatViewUeberschriftenLayout"});
@@ -44,7 +122,7 @@ export class CombatView extends ItemView {
       // Merken der initialen Eingabe zur Übergabe an Combat-State
       const currentElement = evt.target as HTMLElement;
       const cell = currentElement.closest(".editable"); // div, der bearbeitet werden soll
-      let currentText = cell?.textContent;
+      let currentText = cell!.textContent;
 
       // Umwandlung des geklickten div in input-Feld
       if (cell == null) {
@@ -54,36 +132,15 @@ export class CombatView extends ItemView {
       }
     };
 
-    
-    // Neuer Div für Button erstellt, damit beim neu Rendern des Arrays der Button unangetastet bleibt. 
-    const saveTeilnehmerButton = this.container.createEl('div');
-    // Legt ein vorgefertigtes Array an -> für Dev purposes
-    // this.state.defaultTeilnehmerArray();
+    this.combatRoundDiv.ondblclick = (evt: MouseEvent) => {
+      const cell = this.combatRoundDiv.closest(".editable"); // div, der bearbeitet werden soll
+      let currentText = cell!.textContent;
 
-    // Ein neuer Teilnehmer kann durch diesen Button über ein PopUp (Modal) hinzugefügt werden
-    let addTeilnehmerButton = saveTeilnehmerButton.createEl('button', {text: 'Add', cls: 'addTeilnehmerButton'});
-    addTeilnehmerButton.onclick = (evt: MouseEvent) => {
-      new AddPlayerModal(this.app, (neuerTeilnehmer: Teilnehmer) => {
-        this.state.addTeilnehmer(neuerTeilnehmer);
-        this.teilnehmerCollectionDiv.empty();
-      
-        this.renderCombatList();
-      }).open();
-    };
-
-
-    // Der Play-Button, der den Verlauf des Combats um einen Mitspieler weiter verschiebt.
-    let playTeilnehmerButton = saveTeilnehmerButton.createEl('button', {cls: 'addTeilnehmerButton'});
-    setIcon(playTeilnehmerButton, 'arrow-big-right-dash');
-    playTeilnehmerButton.onclick = (evt: MouseEvent) => {
-      // Die background-color des nächsten Eintrages wird auf die highlight-color gesetzt
-      // Die background-color des vorherigen Eintrages wird auf none gesetzt
-      if (this.state.isCombatTeilnehmerEmpty()) { // Die Liste ist leer
-        new Notice("Noch Keine Combat-Teilnehmer");
+      // Umwandlung des geklickten div in input-Feld
+      if (cell == null) {
         return;
       } else {
-        this.state.nextCombatTeilnehmer();
-        this.updateHighlight(this.state.getActiveTeilnehmerIndex());
+        this.makeEditableRoundCounter(cell, currentText);
       }
     };
   }
@@ -100,7 +157,7 @@ export class CombatView extends ItemView {
     let field = currentElement.getAttribute('data-div-type'); // Das Feld, was angeklickt wurde
 
     const input = cell.createEl("input", {
-      value: cell.textContent,
+      value: cell.textContent ?? undefined,
       cls: "teilnehmerViewAttributeInput",
     });
 
@@ -137,6 +194,41 @@ export class CombatView extends ItemView {
     }
 
   }
+  
+  makeEditableRoundCounter(cell: Element, currentRound: string | null): void {
+    cell.empty();
+
+    const input = cell.createEl("input", {
+      value: cell.textContent ?? undefined,
+      cls: "teilnehmerViewAttributeInput",
+    });
+
+    // Direktes Anwählen des input Feldes
+    input.focus();
+
+    // EventListener zur Entscheidung, ob Eingabe gespeichert oder verworfen werden soll
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { 
+
+        currentRound = input.value;
+        
+        this.state.updateRoundCounterFromEditedField(Number(currentRound));
+        this.renderRoundCounter();
+      }
+      if (e.key === "Escape") cancel();
+    });
+
+    input.addEventListener("blur", () => {
+      // Wenn nichts im input steht => Wiederherstellung der letzten Eingabe
+        cancel();
+    });
+
+    // Der Text im div wird wieder auf den vorherigen Wert gesetzt
+    const cancel = () => {
+      cell.textContent = currentRound;
+    }
+
+  }
 
   renderCombatList(): void {
     this.teilnehmerCollectionDiv.empty();
@@ -147,6 +239,12 @@ export class CombatView extends ItemView {
         singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.ini), cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "ini"}});
         singleTeilnehmerRow.createEl('div', {text: teilnehmer.name, cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "name"}});
         singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.leben), cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "leben"}});
+        let delButton = singleTeilnehmerRow.createEl('button', {cls: 'removeTeilnehmerButton'});
+        delButton.addEventListener("click", () => {
+          this.state.removeTeilnehmer(teilnehmer.teilnehmerId);
+          this.renderCombatList();
+        });
+        
         // Neuer Teilnehmer wird in die HTMLElements Liste aufgenommen
         this.htmlElementeTeilnehmerListe.push(singleTeilnehmerRow);
     } 
@@ -175,5 +273,15 @@ export class CombatView extends ItemView {
         }
       });
     }
+  }
+
+  renderRoundCounter(): void {
+    this.combatRoundDiv.setText(String(this.state.getRoundCounter()));
+  }
+
+  highlightRoundCounter(): void {
+    this.combatRoundDiv.setCssProps({
+      "border-color": "#6437cc"
+    });
   }
 }
