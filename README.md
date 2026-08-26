@@ -1,90 +1,87 @@
-# Obsidian Sample Plugin
+# RPG Combat Tracker
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+Keep track of all the friends and foes in a tabletop RPG fight. Never loose track of who's turn it is ever again. 
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+## Table of contents
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open modal (simple)" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+- Description
+- Features
+- Motivation
 
-## First time developing plugins?
+## Description
 
-Quick starting guide for new plugin devs:
+This plugin is designed to help the Dungeon Master of an adventure to focus on the epic fight rather than the logistics of not forgetting who's turn it is. \
+The plugin aims to make the session more enjoyable for everyone involved by making it more easy to keep track of all the members in a fight. Especially in encounters with a lot of enemies.
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+Whoever the Dungeon Master, they can create a Session with any number of participants. \
+Every participant has the following attributes:
 
-## Releasing new releases
+- Initialisation
+- Name
+- Health
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+Those all are attributes that can be set compleatly free. Changing this data is also just a double-click away. \
+All actores of the fight are sorted by the ini.
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+## UI explained
 
-## Adding your plugin to the community plugin list
+![alt text](image.png)
 
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+The picture shows the side panel in which all the participants are managed. I will briefly explain all the Buttons and sections from top left to bottom right.
 
-## How to use
+### Trashcan Button
 
-- Clone this repo.
-- Make sure your NodeJS is at least v16 (`node --version`).
-- `npm i` or `yarn` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
+This Button clears the whole view. All fight-members will be deleted from the View. There is a safety pop-up where you need to agree to delete the session.
 
-## Manually installing the plugin
+### Round Counter
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+The Round Counter shows the current fighting round. It updates automatically and highlights at the beginning of every new round.
 
-## Improve code quality with eslint
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- This project already has eslint preconfigured, you can invoke a check by running`npm run lint`
-- Together with a custom eslint [plugin](https://github.com/eslint-plugin) for Obsidan specific code guidelines.
-- A GitHub action is preconfigured to automatically lint every commit on all branches.
+### Add Button
 
-## Funding URL
+The 'Add-Button' let's you create a new participant for the fight. When pressing the button you can define the stats of the entry. 
 
-You can include funding URLs where people who use your plugin can financially support it.
+### Play Button
 
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
+This Button drives the Highlight forward to the next participant, starting a new round after the last entry.
 
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
-```
+### Entry Rows
 
-If you have multiple URLs, you can also do:
+In every row there is a new participant. From left to right there are ini, name, health, delete button. The delete button removes the entry from the list. \
+!There is no safety question before deletion!
 
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
-```
+## Features
 
-## API Documentation
+- A highlight shows the current players turn
+- The participants are sorted automatically when beeing added. The ini is the metric that does so.
+- Every field can be changed by double-clicking it. The new data will only be saved by hitting Enter
 
-See https://docs.obsidian.md
+## Motivation
+
+My motivation was the desire to work on a programming project that I can build from scratch with only the basics layed out for me. I want to learn more about coding and practice it. I also chose this particular project \
+because I play tabletop games myself and enjoy using Obsidian a lot. I would like to build a plugin that fits my needs in a session and would be happy if others would benefit from my work also. 
+
+## About me
+
+My name is Valle and I'm 26 years old. I study computer science in germany and am very interested in programming. I'm a trained orthopeadic technician but wanted to flip my whole life around..\
+so computer science was the obvious choice, right?\
+I don't have a whole bunch of experience with coding outside of uni but I'm on it! If you'd like to talk about some nerd stuff feel free to contact me. I'm always curious what other people are doing! :D\
+I also linke crafting and making music. I learned to love the Cello and I'm working on improving daily. \
+
+
+## Licence
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
