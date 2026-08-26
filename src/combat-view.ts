@@ -87,6 +87,7 @@ export class CombatView extends ItemView {
       } else {
         this.state.nextCombatTeilnehmer();
         this.updateHighlight(this.state.getActiveTeilnehmerIndex());
+        this.renderCombatList();
       }
 
       if (this.state.getRoundCounter() == 0) {
@@ -239,13 +240,21 @@ export class CombatView extends ItemView {
         singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.ini), cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "ini"}});
         singleTeilnehmerRow.createEl('div', {text: teilnehmer.name, cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "name"}});
         singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.leben), cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "leben"}});
-        let delButton = singleTeilnehmerRow.createEl('button', {cls: 'removeTeilnehmerButton'});
-        delButton.addEventListener("click", () => {
-          this.state.removeTeilnehmer(teilnehmer.teilnehmerId);
-          this.renderCombatList();
-        });
         
-        // Neuer Teilnehmer wird in die HTMLElements Liste aufgenommen
+        // The delete button only deletes the entry, when the highlight isn't on it
+        // I chose to handle it this way because other ways would look bad or be more confusing in my opition
+        let delButton = singleTeilnehmerRow.createEl('button', {cls: 'removeTeilnehmerButton'});
+        if ((teilnehmer.teilnehmerId != this.state.getActiveTeilnehmerID())) {
+          delButton.addEventListener("click", () => {
+            this.state.removeTeilnehmer(teilnehmer.teilnehmerId);
+            this.renderCombatList();
+          });
+        } else {
+          delButton.addEventListener("click", () => {
+            new Notice("A highlighted player can't be deleted");
+          });
+        }
+        // New Entry is added to the list of HTMLElenets
         this.htmlElementeTeilnehmerListe.push(singleTeilnehmerRow);
     } 
     this.updateHighlight(this.state.getActiveTeilnehmerIndex());
