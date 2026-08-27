@@ -65,7 +65,7 @@ export class CombatView extends ItemView {
     this.combatRoundDiv = buttonBarCenterDiv.createEl('div', {text: '0', cls: 'combatRoundCounter editable'});
     this.state.on("round-update", () => {
       this.renderRoundCounter();
-      this.highlightRoundCounter()
+      this.highlightRoundCounter();
     })
 
     // Der Play-Button, der den Verlauf des Combats um einen Mitspieler weiter verschiebt.
@@ -237,10 +237,25 @@ export class CombatView extends ItemView {
     // Alle Namen aus der Liste werden zu Anfang angezeigt
     for (let teilnehmer of this.state.getTeilnehmer()) {
         let singleTeilnehmerRow = this.teilnehmerCollectionDiv.createEl('div', {cls: "teilnehmerViewLayoutSingleRow", attr: {"data-teilnehmer-id": teilnehmer.teilnehmerId}});
-        singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.ini), cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "ini"}});
+        let iniRow = singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.ini), cls: "teilnehmerViewAttribute editable teilnehmerIniAttributeDiv", attr: {"data-div-type": "ini"}});
         singleTeilnehmerRow.createEl('div', {text: teilnehmer.name, cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "name"}});
         singleTeilnehmerRow.createEl('div', {text: String(teilnehmer.leben), cls: "teilnehmerViewAttribute editable", attr: {"data-div-type": "leben"}});
         
+        let iniRowButtonDiv = iniRow.createEl('div', {cls: 'teilnehmerManualMoveButtons'});
+        let buttonTop = iniRowButtonDiv.createEl('button', {cls: 'manualMoveButton'});
+        setIcon(buttonTop, 'chevron-up');
+        let buttonBottom = iniRowButtonDiv.createEl('button', {cls: 'manualMoveButton'});
+        setIcon(buttonBottom, 'chevron-down');
+
+        // The extension when multiple participants have the same ini value
+        // The user can decide in which order the entries with the same ini are supposed to 
+        // be executed
+        // Triggered as a callback for performance purposes
+        this.state.on("visualise-move-buttons", () => {
+          new Notice("In vis drin");
+          
+        })
+
         // The delete button only deletes the entry, when the highlight isn't on it
         // I chose to handle it this way because other ways would look bad or be more confusing in my opition
         let delButton = singleTeilnehmerRow.createEl('button', {cls: 'removeTeilnehmerButton'});
@@ -250,7 +265,7 @@ export class CombatView extends ItemView {
             this.renderCombatList();
           });
         } else {
-          delButton.addEventListener("click", () => {
+            delButton.addEventListener("click", () => {
             new Notice("A highlighted player can't be deleted");
           });
         }

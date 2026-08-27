@@ -27,6 +27,14 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
         this.globalTeilnehmerCount = this.globalTeilnehmerCount + 1;
         this.combatTeilnehmer.push(newTeilnehmer);
         this.sortTeilnehmer();
+
+        // Trigger manual entry shifting if ini already exists in list
+        // Looks complicated but basically asks "Is the ini of newTeilnehmer the same as the ini of the 
+        // Teilnehmer at the position before the newTeilnehmer"
+        if (newTeilnehmer.ini == this.combatTeilnehmer[this.combatTeilnehmer.indexOf(newTeilnehmer) - 1]?.ini) {
+            new Notice("Im state angekommen");
+            // this.trigger("visualise-move-buttons");
+        }
     }
 
     // Ein bestimmter Teilnehmer wird aus der combatTeilnehmer Liste entfernt

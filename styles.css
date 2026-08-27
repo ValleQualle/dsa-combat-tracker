@@ -91,7 +91,7 @@
 
 .teilnehmerViewLayoutSingleRow {
   display: grid;
-  grid-template-columns: 1fr 3fr 1fr 0.1fr;
+  grid-template-columns: 1.5fr 3fr 1fr 0.1fr;
   align-items: center;
 }
 
@@ -115,6 +115,17 @@
   margin-bottom: 3px;
 }
 
+.teilnehmerIniAttributeDiv {
+  text-align: center;
+  justify-content: center;
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+}
+
+.teilnehmerManualMoveButtons {
+  display: grid;
+}
+
 .highlight {
   background-color: #6437cc;
 }
@@ -122,4 +133,20 @@
 .teilnehmerViewAttributeInput {
   width: 80%;
   box-sizing: border-box;
+}
+
+.manualMoveButton {
+  align-self: center;
+  justify-self: center;
+  height: 80%;
+  width: 80%;
+  padding: 0px; /* Needs to be here so the image renders */
+}
+.manualMoveButton svg {
+  width: 100%;
+  height: 100%;
+}
+
+.manualMoveButton:hover {
+  background-color: #6437cc;
 }
