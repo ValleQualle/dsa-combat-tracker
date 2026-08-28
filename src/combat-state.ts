@@ -23,21 +23,23 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
         this.roundCounter = data.roundCounter;
     }
 
-    autosaveCombatStats(saveState: RecoveryData | null) {
+    autosaveCombatStats(): void {
         new Notice("im autosave angekommen");
-        if (saveState != null) {
-            saveState = {
-                combatTeilnehmer: this.combatTeilnehmer,
-                globalTeilnehmerCount: this.globalTeilnehmerCount,
-                activeTeilnehmerID: this.activeTeilnehmerID,
-                newTeilnehmerID: this.newTeilnehmerID,
-                roundCounter: this.roundCounter
-            }
-        } else {
-            // TODO the PersistanceManager needs to subscribe to this Event
-            new Notice("direkt vor dem trigger");
-            this.trigger('autosave-combat');
+        // TODO the PersistanceManager needs to subscribe to this Event
+        new Notice("direkt vor dem trigger");
+        this.trigger('autosave-combat');
+    }
+
+    getRecoveryData(): RecoveryData {
+        let recoveryData: RecoveryData = {
+            combatTeilnehmer: this.combatTeilnehmer,
+            globalTeilnehmerCount: this.globalTeilnehmerCount,
+            activeTeilnehmerID: this.activeTeilnehmerID,
+            newTeilnehmerID: this.newTeilnehmerID,
+            roundCounter: this.roundCounter
         }
+
+        return recoveryData;
     }
 
     defaultTeilnehmerArray(): void {
