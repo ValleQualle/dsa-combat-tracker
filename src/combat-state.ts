@@ -1,4 +1,4 @@
-import { Teilnehmer } from './types';
+import { Teilnehmer, RecoveryData } from './types';
 import { Events, Notice } from 'obsidian';
 
 export class CombatState extends Events { // Erbt von nichts, da kein View oder Plugin
@@ -14,6 +14,32 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
     // Die Variable, die für das Zählen der Spielrunden verantwortlich ist
     private roundCounter: number = 0;
     
+    // Is called when Obsidian opens or the plugin is loaded
+    combatState(data: RecoveryData) {
+        this.combatTeilnehmer = data.combatTeilnehmer;
+        this.globalTeilnehmerCount = data.globalTeilnehmerCount;
+        this.activeTeilnehmerID = data. activeTeilnehmerID;
+        this.newTeilnehmerID = data.newTeilnehmerID;
+        this.roundCounter = data.roundCounter;
+    }
+
+    autosaveCombatStats(saveState: RecoveryData | null) {
+        new Notice("im autosave angekommen");
+        if (saveState != null) {
+            saveState = {
+                combatTeilnehmer: this.combatTeilnehmer,
+                globalTeilnehmerCount: this.globalTeilnehmerCount,
+                activeTeilnehmerID: this.activeTeilnehmerID,
+                newTeilnehmerID: this.newTeilnehmerID,
+                roundCounter: this.roundCounter
+            }
+        } else {
+            // TODO the PersistanceManager needs to subscribe to this Event
+            new Notice("direkt vor dem trigger");
+            this.trigger('autosave-combat');
+        }
+    }
+
     defaultTeilnehmerArray(): void {
         this.combatTeilnehmer.push({teilnehmerId: 1, ini: 15, name: "Alice", leben: 10});
         this.combatTeilnehmer.push({teilnehmerId: 2, ini: 12, name: "Bob", leben: 25});
