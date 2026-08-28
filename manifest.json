@@ -1,9 +1,9 @@
 {
-	"id": "dsa-combat-tracker",
-	"name": "DSA Combat Tracker",
-	"version": "0.0.1",
+	"id": "combat-tracker",
+	"name": "Combat Tracker",
+	"version": "1.0.0",
 	"minAppVersion": "1.5.0",
-	"description": "Ein einfacher Kampf Tracker für DSA.",
+	"description": "An easy combat tracker for tabletopRPG.",
 	"author": "Valle",
 	"authorUrl": "",
 	"isDesktopOnly": true
