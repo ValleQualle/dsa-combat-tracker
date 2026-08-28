@@ -9,11 +9,23 @@
     is not called directly.
 */
 
-import { Component, Notice, App } from "obsidian";
+import { Component, Notice, Vault } from "obsidian";
+import { RecoveryData } from 'types';
 
 export class PersistanceManager extends Component {
 
-    async autosave() {
+    private vault: Vault;
+
+    constructor(private appVault: Vault) {
+        super();
+
+        this.vault = appVault;
+    } 
+
+    // The file gets no postfix so it is not shown in the vault itself. 
+    // The file can be seen and edited in the PCs file system 
+    async autosave(data: RecoveryData): Promise<void> {
         new Notice("autosave triggered");
+        this.vault.create("combatTrackerRecoveryFile.json", JSON.stringify(data));
     }
 }
