@@ -12,17 +12,18 @@ export default class DSACombatTracker extends Plugin {
 	settings: DSACombatTrackerSettings;
 	combatState: CombatState;
 	persistanceManager: PersistanceManager;
-	recoveryCombatData: RecoveryData;
 
 	async onload() {
-		await this.loadSettings();
+		const vault = this.app.vault;
 
+		await this.loadSettings();
+		
 		// await this.loadCombatState();
 
 		// Here the RecoveryData must be checked, if it exists
 		// if so, the RecoveryData must be loaded into the combatState.
 		this.combatState = new CombatState;
-		this.persistanceManager = new PersistanceManager;
+		this.persistanceManager = new PersistanceManager(vault);
 
 		this.registerView(
 		VIEW_TYPE_EXAMPLE,
@@ -70,10 +71,10 @@ export default class DSACombatTracker extends Plugin {
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		//this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 
-		// The listener to call the PersistanceManager
+		// Listening for saving Trigger
 		this.registerEvent(
 			this.combatState.on('autosave-combat', () => {
-				this.persistanceManager.autosave();
+				this.persistanceManager.autosave(this.combatState.getRecoveryData());
 			})
 		);
 
