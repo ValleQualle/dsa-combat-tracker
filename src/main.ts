@@ -1,19 +1,32 @@
 import {App, Editor, MarkdownView, Modal, Notice, Plugin, WorkspaceLeaf} from 'obsidian';
 import {DEFAULT_SETTINGS, DSACombatTrackerSettings, DSACombatTrackerSettingTab} from "./settings";
 import { CombatView, VIEW_TYPE_EXAMPLE } from './combat-view';
+import { RecoveryData } from 'types';
+import { CombatState } from 'combat-state';
+import { PersistanceManager } from 'persistance-manager';
 // import DSACombatTracker from './main';
 
 // Remember to rename these classes and interfaces!
 
 export default class DSACombatTracker extends Plugin {
 	settings: DSACombatTrackerSettings;
+	combatState: CombatState;
+	persistanceManager: PersistanceManager;
+	recoveryCombatData: RecoveryData;
 
 	async onload() {
 		await this.loadSettings();
 
+		// await this.loadCombatState();
+
+		// Here the RecoveryData must be checked, if it exists
+		// if so, the RecoveryData must be loaded into the combatState.
+		this.combatState = new CombatState;
+		this.persistanceManager = new PersistanceManager;
+
 		this.registerView(
 		VIEW_TYPE_EXAMPLE,
-		(leaf) => new CombatView(leaf));
+		(leaf) => new CombatView(leaf ,this.combatState));
 
 		// This creates an icon in the left ribbon.
 
@@ -57,6 +70,13 @@ export default class DSACombatTracker extends Plugin {
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		//this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 
+		// The listener to call the PersistanceManager
+		this.registerEvent(
+			this.combatState.on('autosave-combat', () => {
+				this.persistanceManager.autosave();
+			})
+		);
+
 		console.debug("DSA Combat Tracker geladen");
 	}
 
@@ -91,6 +111,9 @@ export default class DSACombatTracker extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	// implementierung der öffnung der View
+	async loadCombatState(): Promise<void>{
+	}
 
+	async saveCombatState() {
+	}
 }

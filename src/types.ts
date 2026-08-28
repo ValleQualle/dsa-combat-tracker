@@ -5,3 +5,14 @@ export interface Teilnehmer {
     name: string;
     leben: number;
 }
+
+// The interface for saving the session data
+// in case obsidian is closed. The data is can be
+// restored on reopen
+export interface RecoveryData {
+    combatTeilnehmer: Teilnehmer[],
+    globalTeilnehmerCount: number,
+    activeTeilnehmerID: number,
+    newTeilnehmerID: number,
+    roundCounter: number
+}
