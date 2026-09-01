@@ -72,6 +72,8 @@ export default class DSACombatTracker extends Plugin {
 		//this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 
 		// Listening for saving Trigger
+		// If there are too many trigger in main, maybe outsource the trigger to a
+		// dedicated trigger file
 		this.registerEvent(
 			this.combatState.on('autosave-combat', () => {
 				this.persistanceManager.autosave(this.combatState.getRecoveryData());
