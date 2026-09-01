@@ -25,7 +25,6 @@ export class PersistanceManager extends Component {
     // The file gets no postfix so it is not shown in the vault itself. 
     // The file can be seen and edited in the PCs file system 
     async autosave(data: RecoveryData): Promise<void> {
-        new Notice("autosave triggered");
         this.vault.create("combatTrackerRecoveryFile.json", JSON.stringify(data, null, 2));
     }
 }

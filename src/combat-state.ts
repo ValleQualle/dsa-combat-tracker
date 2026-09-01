@@ -23,10 +23,9 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
         this.roundCounter = data.roundCounter;
     }
 
+    // Add this method to the end of every state-changing method
+    // so the changes are being saved
     autosaveCombatStats(): void {
-        new Notice("im autosave angekommen");
-        // TODO the PersistanceManager needs to subscribe to this Event
-        new Notice("direkt vor dem trigger");
         this.trigger('autosave-combat');
     }
 
@@ -55,6 +54,7 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
         this.globalTeilnehmerCount = this.globalTeilnehmerCount + 1;
         this.combatTeilnehmer.push(newTeilnehmer);
         this.sortTeilnehmer();
+        this.autosaveCombatStats();
     }
 
     // Ein bestimmter Teilnehmer wird aus der combatTeilnehmer Liste entfernt
@@ -72,6 +72,7 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
         }
         this.globalTeilnehmerCount--;
         this.combatTeilnehmer = tempCombatTeilnehmer;
+        this.autosaveCombatStats();
     }
 
     // Alle Teilnehmer werden aus der combatTeilnehmer Liste entfernt
@@ -81,6 +82,7 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
         this.activeTeilnehmerID = -1;
         this.globalTeilnehmerCount = 0;
         this.roundCounter = 0;
+        this.autosaveCombatStats();
     }
 
     getTeilnehmer(): Teilnehmer[] {
@@ -88,7 +90,9 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
     }
 
     sortTeilnehmer(): Teilnehmer[] {
-        return this.combatTeilnehmer.sort((a, b) => b.ini - a.ini); // Absteigende Sortierung
+        let tempTeilnehmer = this.combatTeilnehmer.sort((a, b) => b.ini - a.ini); // Absteigende Sortierung
+        this.autosaveCombatStats();
+        return tempTeilnehmer;
     }
 
     updateEditedField(field: string | null, newInputValue: string, id: number): void {
@@ -102,13 +106,16 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
 
         if (field === "leben") {
             foundTeilnehmer.leben = Number(newInputValue);
+            this.autosaveCombatStats();
             return;
         } else if (field === "ini") { 
             foundTeilnehmer.ini = Number(newInputValue);
             this.sortTeilnehmer();
+            // No autosave needed because it is calle din sortTeilnehmer()
             return;
         } else if (field === "name") {
             foundTeilnehmer.name = String(newInputValue);
+            this.autosaveCombatStats();
             return;
         } else {
             console.error("divType nicht in Teilnehmer vorhanden! (combat-state / updateEditableField())");
@@ -121,7 +128,7 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
         if (this.combatTeilnehmer == null || this.isCombatTeilnehmerEmpty()) { // Null-check, fall kein Teilnehmer in der Liste
             throw new Error('Keinen Teilnehmer gefunden. (combat-state / nextCombatTeilnehmer())');
         }
-         // Kein aktiver Teilnehmer, also Anfang der Liste beginnen activeTeilnehmerIndex = 0
+         // No active participant so start at beginning of the list; activeTeilnehmerIndex = 0
         if ((this.activeTeilnehmerID === -1)) {
             this.activeTeilnehmerID = this.combatTeilnehmer[0]!.teilnehmerId;
         // Eine do-while-Schleife wählt so lange den nächsten TN aus, bis einer > 0 Leben besitzt
@@ -136,6 +143,8 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
                 }
             } while ((this.combatTeilnehmer[this.getActiveTeilnehmerIndex()]!.leben <= 0) && (counter <= this.globalTeilnehmerCount));
         }
+        // saving updated stats, independant on the if - else - path
+        this.autosaveCombatStats();
     }
 
     // Wenn alle Teilnehmer der combatListe durchgegangen sind, 
@@ -144,11 +153,12 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
         this.roundCounter++;
         // Ein Event, auf dass die view abboniert und dann einen neuen render triggert
         this.trigger("round-update");
+        this.autosaveCombatStats();
     }
 
     updateRoundCounterFromEditedField(newRoundNumber: number): void {
         this.roundCounter = newRoundNumber;
-        new Notice("In state: " + this.roundCounter);
+        this.autosaveCombatStats();
     }
 
     isCombatTeilnehmerEmpty(): boolean {

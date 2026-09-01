@@ -92,11 +92,6 @@ export class CombatView extends ItemView {
         this.renderRoundCounter();
         this.highlightRoundCounter()
       } 
-
-      new Notice("vor dem Autosave");
-
-      // Test Method, if trigger for persistance works
-      this.state.autosaveCombatStats(null);
     };
 
     // Ein neuer Teilnehmer kann durch diesen Button über ein PopUp (Modal) hinzugefügt werden
