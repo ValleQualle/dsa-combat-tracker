@@ -65,6 +65,10 @@ export class CombatView extends ItemView {
     this.combatRoundDiv = buttonBarCenterDiv.createEl('div', {text: '0', cls: 'combatRoundCounter editable'});
     this.state.on("round-update", this.roundChangeChanges);
 
+    // A listener for renderCombatList calls
+    // used after loading state from autosave file for example
+    this.state.on('render-combat-list', this.combatListRenderTriggered);
+
     // Der Play-Button, der den Verlauf des Combats um einen Mitspieler weiter verschiebt.
     let playTeilnehmerButton = buttonBarRightDiv.createEl('button', {cls: 'addTeilnehmerButton'});
     setIcon(playTeilnehmerButton, 'play');
@@ -145,6 +149,7 @@ export class CombatView extends ItemView {
 
   async onClose() {
     this.state.off("round-update", this.roundChangeChanges);
+    this.state.on('render-combat-list', this.combatListRenderTriggered);
   }
 
   // Methode, die ein div in ein input-Felt verwandelt.
@@ -294,5 +299,9 @@ export class CombatView extends ItemView {
   private roundChangeChanges = () => {
     this.renderRoundCounter();
     this.highlightRoundCounter();
+  };
+
+  private combatListRenderTriggered = () => {
+    this.renderCombatList();
   };
 }
