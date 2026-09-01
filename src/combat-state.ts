@@ -15,12 +15,20 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
     private roundCounter: number = 0;
     
     // Is called when Obsidian opens or the plugin is loaded
-    combatState(data: RecoveryData) {
+    setCombatState(data: RecoveryData | null) {
+        if (data == null) {
+            return;
+        }
         this.combatTeilnehmer = data.combatTeilnehmer;
         this.globalTeilnehmerCount = data.globalTeilnehmerCount;
         this.activeTeilnehmerID = data. activeTeilnehmerID;
         this.newTeilnehmerID = data.newTeilnehmerID;
         this.roundCounter = data.roundCounter;
+
+        new Notice("autosave loaded");
+        console.debug("insode state constructor");
+
+        this.trigger('render-combat-list');
     }
 
     // Add this method to the end of every state-changing method
