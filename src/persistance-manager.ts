@@ -22,10 +22,9 @@ export class PersistanceManager extends Component {
         this.vault = appVault;
     } 
 
-    // The file gets no postfix so it is not shown in the vault itself. 
+    // The file gets the .json postfix so it is not shown in the Obsidian UI itself. 
     // The file can be seen and edited in the PCs file system 
     async autosave(data: RecoveryData): Promise<void> {
-
         if (!this.vault.getFileByPath("combatTrackerRecoveryFile.json")) {
             this.vault.create("combatTrackerRecoveryFile.json", JSON.stringify(data, null, 2));
         } else {
@@ -33,5 +32,26 @@ export class PersistanceManager extends Component {
             let recoveryFile: TFile | null = this.vault.getFileByPath('combatTrackerRecoveryFile.json');
             this.vault.modify(recoveryFile!, JSON.stringify(data, null, 2));
         }
+    }
+
+    // This method is called on restart of the plugin / Obsidian itself
+    async loadAutosave(): Promise<RecoveryData | null> {
+        let recoveryFile: TFile | null = this.vault.getFileByPath("combatTrackerRecoveryFile.json");
+        let outputData: RecoveryData | null = null;
+        
+        new Notice("inside loadAutosave");
+        console.debug("inside loadAutosave");
+        if (recoveryFile !== null) {
+            new Notice("recoveryFile != null");
+            console.debug("recoveryFile != null");
+            let recoveryFileData = this.vault.read(recoveryFile);
+            recoveryFileData.then((str: string) => {
+                outputData = JSON.parse(str);
+            });
+            return outputData;
+        } 
+        new Notice("recoveryFile == null");
+        console.debug("recoveryFile == null");
+        return recoveryFile;
     }
 }

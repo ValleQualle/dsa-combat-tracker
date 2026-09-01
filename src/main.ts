@@ -15,6 +15,10 @@ export default class DSACombatTracker extends Plugin {
 
 	async onload() {
 		const vault = this.app.vault;
+		console.log(this.app.vault.getFiles().map(file => file.path));
+		console.log(
+			await this.app.vault.adapter.list("")
+		);
 
 		await this.loadSettings();
 		
@@ -70,6 +74,12 @@ export default class DSACombatTracker extends Plugin {
 
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		//this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+
+		// The autosave file is being read and wrote to the combat state for recovery of 
+		// the old state
+		this.persistanceManager.loadAutosave().then((data: RecoveryData | null) => {
+			this.combatState.setCombatState(data);
+		});
 
 		// Listening for saving Trigger
 		// If there are too many trigger in main, maybe outsource the trigger to a
