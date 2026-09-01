@@ -9,7 +9,7 @@
     is not called directly.
 */
 
-import { Component, Notice, Vault } from "obsidian";
+import { Component, Notice, TFile, Vault } from "obsidian";
 import { RecoveryData } from 'types';
 
 export class PersistanceManager extends Component {
@@ -25,6 +25,13 @@ export class PersistanceManager extends Component {
     // The file gets no postfix so it is not shown in the vault itself. 
     // The file can be seen and edited in the PCs file system 
     async autosave(data: RecoveryData): Promise<void> {
-        this.vault.create("combatTrackerRecoveryFile.json", JSON.stringify(data, null, 2));
+
+        if (!this.vault.getFileByPath("combatTrackerRecoveryFile.json")) {
+            this.vault.create("combatTrackerRecoveryFile.json", JSON.stringify(data, null, 2));
+        } else {
+            // recoveryFile must be found because of the if - check beforehand
+            let recoveryFile: TFile | null = this.vault.getFileByPath('combatTrackerRecoveryFile.json');
+            this.vault.modify(recoveryFile!, JSON.stringify(data, null, 2));
+        }
     }
 }
