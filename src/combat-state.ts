@@ -25,10 +25,8 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
         this.newTeilnehmerID = data.newTeilnehmerID;
         this.roundCounter = data.roundCounter;
 
-        new Notice("autosave loaded");
-        console.debug("insode state constructor");
-
         this.trigger('render-combat-list');
+        this.trigger("round-update");
     }
 
     // Add this method to the end of every state-changing method
