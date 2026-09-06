@@ -1,4 +1,4 @@
-import {App, Editor, MarkdownView, Modal, Notice, Plugin, WorkspaceLeaf} from 'obsidian';
+import {TFile , App, Editor, MarkdownView, Modal, Notice, Plugin, WorkspaceLeaf} from 'obsidian';
 import {DEFAULT_SETTINGS, DSACombatTrackerSettings, DSACombatTrackerSettingTab} from "./settings";
 import { CombatView, VIEW_TYPE_EXAMPLE } from './combat-view';
 import { RecoveryData } from 'types';
@@ -15,14 +15,8 @@ export default class DSACombatTracker extends Plugin {
 
 	async onload() {
 		const vault = this.app.vault;
-		console.log(this.app.vault.getFiles().map(file => file.path));
-		console.log(
-			await this.app.vault.adapter.list("")
-		);
 
 		await this.loadSettings();
-		
-		// await this.loadCombatState();
 
 		// Here the RecoveryData must be checked, if it exists
 		// if so, the RecoveryData must be loaded into the combatState.
@@ -72,13 +66,15 @@ export default class DSACombatTracker extends Plugin {
 		});
 		*/
 
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		//this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+		this.app.workspace.onLayoutReady(() => {
+			// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
+			//this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 
-		// The autosave file is being read and wrote to the combat state for recovery of 
-		// the old state
-		this.persistanceManager.loadAutosave().then((data: RecoveryData | null) => {
-			this.combatState.setCombatState(data);
+			// The autosave file is being read and wrote to the combat state for recovery of 
+			// the old state
+			this.persistanceManager.loadAutosave().then((data: RecoveryData | null) => {
+				this.combatState.setCombatState(data);
+			});
 		});
 
 		// Listening for saving Trigger

@@ -149,7 +149,7 @@ export class CombatView extends ItemView {
 
   async onClose() {
     this.state.off("round-update", this.roundChangeChanges);
-    this.state.on('render-combat-list', this.combatListRenderTriggered);
+    this.state.off('render-combat-list', this.combatListRenderTriggered);
   }
 
   // Methode, die ein div in ein input-Felt verwandelt.
@@ -298,10 +298,13 @@ export class CombatView extends ItemView {
 
   private roundChangeChanges = () => {
     this.renderRoundCounter();
-    this.highlightRoundCounter();
+    if (this.state.getActiveTeilnehmerIndex() == 0) {
+      this.highlightRoundCounter();
+    }
   };
 
   private combatListRenderTriggered = () => {
     this.renderCombatList();
+    //this.renderRoundCounter();
   };
 }
