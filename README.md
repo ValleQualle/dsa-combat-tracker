@@ -25,7 +25,7 @@ All actores of the fight are sorted by the ini.
 
 ## UI explained
 
-![alt text](image.png)
+![alt text](combatTracker_image.png)
 
 The picture shows the side panel in which all the participants are managed. I will briefly explain all the Buttons and sections from top left to bottom right.
 
@@ -54,12 +54,13 @@ In every row there is a new participant. From left to right there are ini, name,
 
 - A highlight shows the current players turn
 - The participants are sorted automatically when beeing added. The ini is the metric that does so.
-- Every field can be changed by double-clicking it. The new data will only be saved by hitting Enter
+- Every field can be changed by double-clicking it. The new data will only be saved by hitting 'Enter'. Pressing 'Esc' or hitting an area outside the data-field will cancel the action and restore the old value.
+- Autosave of the current combat state. The plugin will save your changes automatically. Also the data will be loaded automatically when Obsidian is closed and reopened. 
+    The restoration file needt to be in the root path of the plugin. There will be a new file created if there ist no recovery file yet. 
 
 ## Motivation
 
-My motivation was the desire to work on a programming project that I can build from scratch with only the basics layed out for me. I want to learn more about coding and practice it. I also chose this particular project \
-because I play tabletop games myself and enjoy using Obsidian a lot. I would like to build a plugin that fits my needs in a session and would be happy if others would benefit from my work also. 
+My motivation was the desire to work on a programming project that I can build from scratch with only the basics layed out for me. I want to learn more about coding and practice it. I also chose this particular project because I play tabletop games myself and enjoy using Obsidian a lot. I would like to build a plugin that fits my needs in a session and would be happy if others would benefit from my work also. 
 
 ## About me
 
