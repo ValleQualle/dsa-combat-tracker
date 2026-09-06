@@ -9,7 +9,7 @@
     is not called directly.
 */
 
-import { Component, Notice, TFile, Vault } from "obsidian";
+import { Component , Notice, TFile, Vault , App } from "obsidian";
 import { RecoveryData } from 'types';
 
 export class PersistanceManager extends Component {
@@ -36,22 +36,13 @@ export class PersistanceManager extends Component {
 
     // This method is called on restart of the plugin / Obsidian itself
     async loadAutosave(): Promise<RecoveryData | null> {
-        let recoveryFile: TFile | null = this.vault.getFileByPath("combatTrackerRecoveryFile.json");
-        let outputData: RecoveryData | null = null;
-        
-        new Notice("inside loadAutosave");
-        console.debug("inside loadAutosave");
-        if (recoveryFile !== null) {
-            new Notice("recoveryFile != null");
-            console.debug("recoveryFile != null");
-            let recoveryFileData = this.vault.read(recoveryFile);
-            recoveryFileData.then((str: string) => {
-                outputData = JSON.parse(str);
-            });
+        let recoveryFile: TFile | null = this.vault.getFileByPath('combatTrackerRecoveryFile.json');
+        if (recoveryFile != null) {
+            let recoveryFileData = await this.vault.read(recoveryFile);
+
+            let outputData = JSON.parse(recoveryFileData);
             return outputData;
         } 
-        new Notice("recoveryFile == null");
-        console.debug("recoveryFile == null");
         return recoveryFile;
     }
 }
