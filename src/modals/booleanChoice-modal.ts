@@ -1,5 +1,4 @@
 import { App, Modal, Setting } from 'obsidian';
-import { BenchTask } from 'vitest';
 
 export class BooleanChoiceModal extends Modal {
 

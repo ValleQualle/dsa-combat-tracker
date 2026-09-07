@@ -1,4 +1,4 @@
-import {TFile , App, Editor, MarkdownView, Modal, Notice, Plugin, WorkspaceLeaf} from 'obsidian';
+import {Editor, MarkdownView, Notice, Plugin, WorkspaceLeaf} from 'obsidian';
 import {DEFAULT_SETTINGS, DSACombatTrackerSettings, DSACombatTrackerSettingTab} from "./settings";
 import { CombatView, VIEW_TYPE_EXAMPLE } from './combat-view';
 import { RecoveryData } from 'types';
@@ -72,8 +72,12 @@ export default class DSACombatTracker extends Plugin {
 
 			// The autosave file is being read and wrote to the combat state for recovery of 
 			// the old state
-			this.persistanceManager.loadAutosave().then((data: RecoveryData | null) => {
+			this.persistanceManager.loadAutosave()
+			.then((data: RecoveryData | null) => {
 				this.combatState.setCombatState(data);
+			})
+			.catch((error) => {
+				console.error("Failed to load autosave: ", error);
 			});
 		});
 
@@ -82,7 +86,10 @@ export default class DSACombatTracker extends Plugin {
 		// dedicated trigger file
 		this.registerEvent(
 			this.combatState.on('autosave-combat', () => {
-				this.persistanceManager.autosave(this.combatState.getRecoveryData());
+				this.persistanceManager.autosave(this.combatState.getRecoveryData())
+				.catch((error) => {
+					console.error("Combat couldn't be saved: ", error);
+				});
 			})
 		);
 
