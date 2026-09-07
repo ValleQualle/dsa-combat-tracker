@@ -1,6 +1,4 @@
 import { App, Modal } from 'obsidian';
-import { CombatView } from 'combat-view';
-import DSACombatTracker from '../main';
 import { Teilnehmer } from 'types';
 
 export class AddPlayerModal extends Modal {
