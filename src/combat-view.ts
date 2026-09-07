@@ -1,5 +1,5 @@
 import { ItemView, WorkspaceLeaf, Notice, setIcon, setTooltip } from 'obsidian';
-import { AddPlayerModal  } from 'modals/add-modal';
+import { AddPlayerModal } from 'modals/add-modal';
 import { BooleanChoiceModal } from 'modals/booleanChoice-modal';
 import { Teilnehmer } from './types';
 import { CombatState } from 'combat-state';
@@ -16,9 +16,9 @@ export class CombatView extends ItemView {
   // Hält den div, der die Rundennummer hält
   private combatRoundDiv!: HTMLElement;
 
-  constructor(leaf: WorkspaceLeaf) {
+  constructor(leaf: WorkspaceLeaf, state: CombatState) {
     super(leaf);
-    this.state = new CombatState;
+    this.state = state;
   }
 
   getViewType() {
@@ -63,10 +63,11 @@ export class CombatView extends ItemView {
 
     // Der Kampfrundenanzeiger
     this.combatRoundDiv = buttonBarCenterDiv.createEl('div', {text: '0', cls: 'combatRoundCounter editable'});
-    this.state.on("round-update", () => {
-      this.renderRoundCounter();
-      this.highlightRoundCounter()
-    })
+    this.state.on("round-update", this.roundChangeChanges);
+
+    // A listener for renderCombatList calls
+    // used after loading state from autosave file for example
+    this.state.on('render-combat-list', this.combatListRenderTriggered);
 
     // Der Play-Button, der den Verlauf des Combats um einen Mitspieler weiter verschiebt.
     let playTeilnehmerButton = buttonBarRightDiv.createEl('button', {cls: 'addTeilnehmerButton'});
@@ -147,7 +148,8 @@ export class CombatView extends ItemView {
   }
 
   async onClose() {
-    // Nothing to clean up.
+    this.state.off("round-update", this.roundChangeChanges);
+    this.state.off('render-combat-list', this.combatListRenderTriggered);
   }
 
   // Methode, die ein div in ein input-Felt verwandelt.
@@ -293,4 +295,16 @@ export class CombatView extends ItemView {
       "border-color": "#6437cc"
     });
   }
+
+  private roundChangeChanges = () => {
+    this.renderRoundCounter();
+    if (this.state.getActiveTeilnehmerIndex() == 0) {
+      this.highlightRoundCounter();
+    }
+  };
+
+  private combatListRenderTriggered = () => {
+    this.renderCombatList();
+    //this.renderRoundCounter();
+  };
 }

@@ -1,19 +1,31 @@
-import {App, Editor, MarkdownView, Modal, Notice, Plugin, WorkspaceLeaf} from 'obsidian';
+import {Editor, MarkdownView, Notice, Plugin, WorkspaceLeaf} from 'obsidian';
 import {DEFAULT_SETTINGS, DSACombatTrackerSettings, DSACombatTrackerSettingTab} from "./settings";
 import { CombatView, VIEW_TYPE_EXAMPLE } from './combat-view';
+import { RecoveryData } from 'types';
+import { CombatState } from 'combat-state';
+import { PersistanceManager } from 'persistance-manager';
 // import DSACombatTracker from './main';
 
 // Remember to rename these classes and interfaces!
 
 export default class DSACombatTracker extends Plugin {
 	settings: DSACombatTrackerSettings;
+	combatState: CombatState;
+	persistanceManager: PersistanceManager;
 
 	async onload() {
+		const vault = this.app.vault;
+
 		await this.loadSettings();
+
+		// Here the RecoveryData must be checked, if it exists
+		// if so, the RecoveryData must be loaded into the combatState.
+		this.combatState = new CombatState;
+		this.persistanceManager = new PersistanceManager(vault);
 
 		this.registerView(
 		VIEW_TYPE_EXAMPLE,
-		(leaf) => new CombatView(leaf));
+		(leaf) => new CombatView(leaf ,this.combatState));
 
 		// This creates an icon in the left ribbon.
 
@@ -54,8 +66,32 @@ export default class DSACombatTracker extends Plugin {
 		});
 		*/
 
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		//this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+		this.app.workspace.onLayoutReady(() => {
+			// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
+			//this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+
+			// The autosave file is being read and wrote to the combat state for recovery of 
+			// the old state
+			this.persistanceManager.loadAutosave()
+			.then((data: RecoveryData | null) => {
+				this.combatState.setCombatState(data);
+			})
+			.catch((error) => {
+				console.error("Failed to load autosave: ", error);
+			});
+		});
+
+		// Listening for saving Trigger
+		// If there are too many trigger in main, maybe outsource the trigger to a
+		// dedicated trigger file
+		this.registerEvent(
+			this.combatState.on('autosave-combat', () => {
+				this.persistanceManager.autosave(this.combatState.getRecoveryData())
+				.catch((error) => {
+					console.error("Combat couldn't be saved: ", error);
+				});
+			})
+		);
 
 		console.debug("DSA Combat Tracker geladen");
 	}
@@ -91,6 +127,9 @@ export default class DSACombatTracker extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	// implementierung der öffnung der View
+	async loadCombatState(): Promise<void>{
+	}
 
+	async saveCombatState() {
+	}
 }

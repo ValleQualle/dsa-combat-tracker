@@ -1,4 +1,4 @@
-import { Teilnehmer } from './types';
+import { Teilnehmer, RecoveryData } from './types';
 import { Events, Notice } from 'obsidian';
 
 export class CombatState extends Events { // Erbt von nichts, da kein View oder Plugin
@@ -14,6 +14,39 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
     // Die Variable, die für das Zählen der Spielrunden verantwortlich ist
     private roundCounter: number = 0;
     
+    // Is called when Obsidian opens or the plugin is loaded
+    setCombatState(data: RecoveryData | null) {
+        if (data == null) {
+            return;
+        }
+        this.combatTeilnehmer = data.combatTeilnehmer;
+        this.globalTeilnehmerCount = data.globalTeilnehmerCount;
+        this.activeTeilnehmerID = data. activeTeilnehmerID;
+        this.newTeilnehmerID = data.newTeilnehmerID;
+        this.roundCounter = data.roundCounter;
+
+        this.trigger('render-combat-list');
+        this.trigger("round-update");
+    }
+
+    // Add this method to the end of every state-changing method
+    // so the changes are being saved
+    autosaveCombatStats(): void {
+        this.trigger('autosave-combat');
+    }
+
+    getRecoveryData(): RecoveryData {
+        let recoveryData: RecoveryData = {
+            combatTeilnehmer: this.combatTeilnehmer,
+            globalTeilnehmerCount: this.globalTeilnehmerCount,
+            activeTeilnehmerID: this.activeTeilnehmerID,
+            newTeilnehmerID: this.newTeilnehmerID,
+            roundCounter: this.roundCounter
+        }
+
+        return recoveryData;
+    }
+
     defaultTeilnehmerArray(): void {
         this.combatTeilnehmer.push({teilnehmerId: 1, ini: 15, name: "Alice", leben: 10});
         this.combatTeilnehmer.push({teilnehmerId: 2, ini: 12, name: "Bob", leben: 25});
@@ -27,6 +60,7 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
         this.globalTeilnehmerCount = this.globalTeilnehmerCount + 1;
         this.combatTeilnehmer.push(newTeilnehmer);
         this.sortTeilnehmer();
+        this.autosaveCombatStats();
     }
 
     // Ein bestimmter Teilnehmer wird aus der combatTeilnehmer Liste entfernt
@@ -44,6 +78,7 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
         }
         this.globalTeilnehmerCount--;
         this.combatTeilnehmer = tempCombatTeilnehmer;
+        this.autosaveCombatStats();
     }
 
     // Alle Teilnehmer werden aus der combatTeilnehmer Liste entfernt
@@ -53,6 +88,7 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
         this.activeTeilnehmerID = -1;
         this.globalTeilnehmerCount = 0;
         this.roundCounter = 0;
+        this.autosaveCombatStats();
     }
 
     getTeilnehmer(): Teilnehmer[] {
@@ -60,7 +96,9 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
     }
 
     sortTeilnehmer(): Teilnehmer[] {
-        return this.combatTeilnehmer.sort((a, b) => b.ini - a.ini); // Absteigende Sortierung
+        let tempTeilnehmer = this.combatTeilnehmer.sort((a, b) => b.ini - a.ini); // Absteigende Sortierung
+        this.autosaveCombatStats();
+        return tempTeilnehmer;
     }
 
     updateEditedField(field: string | null, newInputValue: string, id: number): void {
@@ -74,13 +112,16 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
 
         if (field === "leben") {
             foundTeilnehmer.leben = Number(newInputValue);
+            this.autosaveCombatStats();
             return;
         } else if (field === "ini") { 
             foundTeilnehmer.ini = Number(newInputValue);
             this.sortTeilnehmer();
+            // No autosave needed because it is calle din sortTeilnehmer()
             return;
         } else if (field === "name") {
             foundTeilnehmer.name = String(newInputValue);
+            this.autosaveCombatStats();
             return;
         } else {
             console.error("divType nicht in Teilnehmer vorhanden! (combat-state / updateEditableField())");
@@ -93,7 +134,7 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
         if (this.combatTeilnehmer == null || this.isCombatTeilnehmerEmpty()) { // Null-check, fall kein Teilnehmer in der Liste
             throw new Error('Keinen Teilnehmer gefunden. (combat-state / nextCombatTeilnehmer())');
         }
-         // Kein aktiver Teilnehmer, also Anfang der Liste beginnen activeTeilnehmerIndex = 0
+         // No active participant so start at beginning of the list; activeTeilnehmerIndex = 0
         if ((this.activeTeilnehmerID === -1)) {
             this.activeTeilnehmerID = this.combatTeilnehmer[0]!.teilnehmerId;
         // Eine do-while-Schleife wählt so lange den nächsten TN aus, bis einer > 0 Leben besitzt
@@ -108,6 +149,8 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
                 }
             } while ((this.combatTeilnehmer[this.getActiveTeilnehmerIndex()]!.leben <= 0) && (counter <= this.globalTeilnehmerCount));
         }
+        // saving updated stats, independant on the if - else - path
+        this.autosaveCombatStats();
     }
 
     // Wenn alle Teilnehmer der combatListe durchgegangen sind, 
@@ -116,11 +159,12 @@ export class CombatState extends Events { // Erbt von nichts, da kein View oder 
         this.roundCounter++;
         // Ein Event, auf dass die view abboniert und dann einen neuen render triggert
         this.trigger("round-update");
+        this.autosaveCombatStats();
     }
 
     updateRoundCounterFromEditedField(newRoundNumber: number): void {
         this.roundCounter = newRoundNumber;
-        new Notice("In state: " + this.roundCounter);
+        this.autosaveCombatStats();
     }
 
     isCombatTeilnehmerEmpty(): boolean {
