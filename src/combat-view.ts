@@ -29,6 +29,10 @@ export class CombatView extends ItemView {
     return 'Combat view';
   }
 
+  getIcon(): string {
+    return 'swords';
+  }
+
   async onOpen() {
     // Titel der Combat View Seite
     this.container.empty();

@@ -1,4 +1,4 @@
-import {Editor, MarkdownView, Notice, Plugin, WorkspaceLeaf} from 'obsidian';
+import {Editor, MarkdownView, Notice, Plugin, setIcon, WorkspaceLeaf} from 'obsidian';
 import {DEFAULT_SETTINGS, DSACombatTrackerSettings, DSACombatTrackerSettingTab} from "./settings";
 import { CombatView, VIEW_TYPE_EXAMPLE } from './combat-view';
 import { RecoveryData } from 'types';
@@ -18,8 +18,6 @@ export default class DSACombatTracker extends Plugin {
 
 		await this.loadSettings();
 
-		// Here the RecoveryData must be checked, if it exists
-		// if so, the RecoveryData must be loaded into the combatState.
 		this.combatState = new CombatState;
 		this.persistanceManager = new PersistanceManager(vault);
 
@@ -29,30 +27,11 @@ export default class DSACombatTracker extends Plugin {
 
 		// This creates an icon in the left ribbon.
 
-		this.addRibbonIcon('dice', 'Open combat view', (evt: MouseEvent) => {
+		this.addRibbonIcon('swords', 'Open combat view', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
 			// new Notice('This is a notice!');
 			// Öffnet neues Fenster des Plugins? -valle
 			void this.activateView();
-		});
-
-		// Zeigt alle Leaves im workspace an
-		this.addRibbonIcon('dice', 'Print leaf types', () => {
-			this.app.workspace.iterateAllLeaves((leaf) => {
-				console.debug(leaf.getViewState().type);
-			});
-		});
-
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status bar text');
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'replace-selected',
-			name: 'Replace selected content',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				editor.replaceSelection('Sample editor command');
-			}
 		});
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
